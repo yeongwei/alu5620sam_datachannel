@@ -20,6 +20,20 @@ function process_equipment_interface_stats(record)
 {
     var myId;
 	var subelement = LOOKUP.get(record.monitoredObjectPointer);
+	
+	if (record.suspect == 'true')
+	{
+		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "Suspect:" + record.suspect);
+		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "Discarding all interface stats metrics");
+		return;
+	}
+	else if (record.suspect == 'false')
+	{
+		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "Suspect:" + record.suspect);
+		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "Process all interface stats metrics");
+	}
+	
+	
 	if(subelement == null)	
 	{
 		logP5Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "Skipping 0 rid for --> "+ record.monitoredObjectPointer);
