@@ -41,9 +41,9 @@ function nat_natpool(samObject, modelInterface)
 		var siteIdExp	= new RegExp('(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)');
 		var value = siteIdExp.exec(monobj);
 		var siteId = value[0];
-	element = OPERATOR.elementNamedOrNew(siteId);
+	element = OPERATOR.elementNamedOrNew("5620_SAM_NATPool_Node_"+siteId);
 	element.state = true;
-	element.name = samObject.routerId.toString();
+	//element.name = samObject.routerId.toString();
 	element.origin = "SAM" ;
 	element.collectorNumber = polled_stats_collector;
 
