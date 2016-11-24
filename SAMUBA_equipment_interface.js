@@ -19,20 +19,11 @@
 function process_equipment_interface_stats(record)
 {
     var myId;
+    
+  //code change start for PMR 16450 
+    var suspectFlagVal=1;
+    var _timestampName = null;     
 	var subelement = LOOKUP.get(record.monitoredObjectPointer);
-	
-	if (record.suspect == 'true')
-	{
-		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "Suspect:" + record.suspect);
-		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "Discarding all interface stats metrics");
-		return;
-	}
-	else if (record.suspect == 'false')
-	{
-		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "Suspect:" + record.suspect);
-		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "Process all interface stats metrics");
-	}
-	
 	
 	if(subelement == null)	
 	{
@@ -42,6 +33,35 @@ function process_equipment_interface_stats(record)
 
 	myId = subelement.id;  
     logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "ENTERING for --> "+ record.monitoredObjectPointer + " with id == " + myId);
+  //code change end for PMR 16450
+    
+	if (record.suspect == 'true')
+	{
+		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "Suspect:" + record.suspect);
+		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "Discarding all interface stats metrics");
+	//code change start for PMR 16450
+		suspectFlagVal=0;		 
+		theMetric = OPERATOR.FloatMetric();		
+		_timestampName = metricClassTimestampMapping[record["className"]];
+		theMetric.timestamp = ParseTimestamp(record[_timestampName]);
+		theMetric.name = "AP~Specific~Alcatel~5620 SAM~Bulk~equipment~InterfaceStats~suspect";
+		theMetric.rid = myId;
+		theMetric.value = suspectFlagVal;
+		OPERATOR.addMetric(theMetric);	
+		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "suspectFlagVal:" + suspectFlagVal);
+	//code change end for PMR 16450 
+		return;
+	}
+	else if (record.suspect == 'false')
+	{
+		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "Suspect:" + record.suspect);
+		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "Process all interface stats metrics");
+		suspectFlagVal=1;
+		logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "suspectFlagVal:" + suspectFlagVal);
+	}
+	
+	
+	
 	
     for(var i = 0; i < equipmentInterfaceMetrics.length; i++)
 	{
@@ -51,7 +71,20 @@ function process_equipment_interface_stats(record)
 		theMetric.rid = myId;
 		theMetric.value = record[equipmentInterfaceMetrics[i]];
 		OPERATOR.addMetric(theMetric);*/
-		CreateSimpleMetricObject(myId, record, "AP~Specific~Alcatel~5620 SAM~Bulk~equipment~InterfaceStats~", equipmentInterfaceMetrics[i]);
+    	if(equipmentInterfaceMetrics[i] != 'suspect'){
+    		CreateSimpleMetricObject(myId, record, "AP~Specific~Alcatel~5620 SAM~Bulk~equipment~InterfaceStats~", equipmentInterfaceMetrics[i]);
+    	}else{
+    	//code change start for PMR 16450    				 
+    		theMetric = OPERATOR.FloatMetric();		
+    		_timestampName = metricClassTimestampMapping[record["className"]];
+    		theMetric.timestamp = ParseTimestamp(record[_timestampName]);
+    		theMetric.name = "AP~Specific~Alcatel~5620 SAM~Bulk~equipment~InterfaceStats~suspect";
+    		theMetric.rid = myId;
+    		theMetric.value = suspectFlagVal;
+    		OPERATOR.addMetric(theMetric);		
+    		//logP4Msg("Suspect Value set 21");
+    	//code change end for PMR 16450 
+    	}
 	}
     
 	logP4Msg("process_equipment_interface_stats", "SAMUBA_equipment_interface", "LEAVING");

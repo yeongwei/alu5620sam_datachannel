@@ -29,8 +29,10 @@ var equipmentInterfaceMetrics   = [ "receivedOctetsPeriodic",
 				    "outboundPacketsDiscardedPeriodic",
 				    "outboundBadPacketsPeriodic",
 					"suspect",
-				    "timeCaptured"
-				    //"periodicTime"
+				    "timeCaptured",
+				  //code change start for PMR 16450
+				    "periodicTime"
+				  //code change end for PMR 16450
 					//Added for suspect flag enhancement
 					//"suspect"//Not within 2.12
 				    ];
@@ -47,8 +49,10 @@ var equipmentInterfaceAdditionalMetrics  = [ "receivedTotalOctetsPeriodic",
 					     "transmittedMulticastPacketsPeriodic",
 					     "transmittedBroadcastPacketsPeriodic",
 					     "suspect",
-						 "timeCaptured"
-					     //"periodicTime"
+						 "timeCaptured",
+						//code change start for PMR 16450
+					     "periodicTime"
+						//code change end for PMR 16450
 						 //Added for suspect flag enhancement
 					     //"suspect"//Not within 2.12
 					     ];
@@ -100,8 +104,10 @@ var mplsInterfaceMetrics = [ "transmitPacketsPeriodic",
 			     "receivePacketsPeriodic",
 			     "transmitOctetsPeriodic",
 			     "receiveOctetsPeriodic",
-			     "timeCaptured"
-			     //"periodicTime"
+			     "timeCaptured",
+			   //code change start for PMR 16450 
+			     "periodicTime"
+			   //code change end for PMR 16450 
 			     ];
 
 
@@ -124,8 +130,10 @@ var sdpBindingMetrics = ["egressForwardedOctetsPeriodic",
 			 "ingressForwardedPacketsPeriodic",
 			 "ingressDroppedOctetsPeriodic",
 			 "ingressForwardedOctetsPeriodic",
-			 "timeCaptured"
-			 //"periodicTime"
+			 "timeCaptured",
+			//code change start for PMR 16450
+			 "periodicTime"
+			//code change end for PMR 16450 
 			 ];
 
 
@@ -222,8 +230,10 @@ var AggrMaintRxStatsMetrics =
  	'aggrMaintRxTRCFUnicastPeriodic',
  	'aggrMaintRxTRCOPeriodic',
  	'aggrMaintRxTRSEFPeriodic',
- 	"timeCaptured"
-	//"periodicTime"
+ 	"timeCaptured",
+ 	//code change start for PMR 16450
+	"periodicTime"
+ 	//code change end for PMR 16450
 ];
 
 //For ethernetequipment.AggrMaintTxStatsLogRecord
@@ -235,8 +245,10 @@ var AggrMaintTxStatsMetrics =
 	'aggrMaintTxTTFPeriodic',
 	'aggrMaintTxTTFUnicastPeriodic',
 	'aggrMaintTxTTOPeriodic',
-	"timeCaptured"
-	//"periodicTime"
+	"timeCaptured",
+	//code change start for PMR 16450
+	"periodicTime"
+	//code change end for PMR 16450
 ];
 
 //For mpr.IMALinkCurrentStatsLogRecord
@@ -254,8 +266,10 @@ var IMALinkCurrentStatsMetrics =
 	'imaLinkCurrentNeSevErroredSecsPeriodic',
 	'imaLinkCurrentNeTxUnusableSecsPeriodic',
 	'imaLinkCurrentNeUnavailSecsPeriodic',
-	"timeCaptured"
-	//"periodicTime"
+	"timeCaptured",
+	//code change start for PMR 16450
+	"periodicTime"
+	//code change end for PMR 16450
 ];
 //For radioequipment.RadioAnalogueMeasureLogRecord
 var RadioAnalogueMeasureMetrics = 
@@ -275,8 +289,10 @@ var PdhFrameHopHistoryDataStats15MinMetrics =
 	'pdhFrameHopHDEsPeriodic',
 	'pdhFrameHopHDSesPeriodic',
 	'pdhFrameHopHDUasPeriodic', 
-	"timeCaptured"
-	//"periodicTime"
+	"timeCaptured",
+	//code change start for PMR 16450
+	"periodicTime"
+	//code change end for PMR 16450
 ];
 
 //For radioequipment.PdhFrameLinkHistoryDataStats15Min
@@ -286,8 +302,10 @@ var PdhFrameLinkHistoryDataStats15MinMetrics =
 	'pdhFrameLinkHDEsPeriodic',
 	'pdhFrameLinkHDSesPeriodic',
 	'pdhFrameLinkHDUasPeriodic', 
-	"timeCaptured"
-	//"periodicTime"
+	"timeCaptured",
+	//code change start for PMR 16450
+	"periodicTime"
+	//code change end for PMR 16450
 ];
 
 //For tdmequipment.E1HistoryStats15minInLogRecord
@@ -297,8 +315,10 @@ var E1HistoryStats15minInLogRecordMetrics =
 	'e1HDSes',
 	'e1HDUas',
 	'e1HDBbe', 
-	"timeCaptured"
-	//"periodicTime"
+	"timeCaptured",
+	//code change start for PMR 16450
+	"periodicTime"
+	//code change end for PMR 16450
 ];
 
 //For tdmequipment.E1HistoryStats15minOutLogRecord
@@ -308,8 +328,10 @@ var E1HistoryStats15minOutLogRecordMetrics =
 	'e1HDSes',
 	'e1HDUas',
 	'e1HDBbe', 
-	"timeCaptured"
-	 //"periodicTime"
+	"timeCaptured",
+	//code change start for PMR 16450
+	 "periodicTime"
+	//code change end for PMR 16450
 ];
 
 //For tdmequipment.DS1HistoryStats15minInLogRecord
@@ -318,8 +340,10 @@ var DS1HistoryStats15minInLogRecordMetrics =
 	'ds1HDEs',
 	'ds1HDSes',
 	'ds1HDUas',
-	"timeCaptured"
-	//"periodicTime"
+	"timeCaptured",
+	//code change start for PMR 16450
+	"periodicTime"
+	//code change end for PMR 16450
 ];
 
 //For tdmequipment.DS1HistoryStats15minOutLogRecord
@@ -328,8 +352,10 @@ var DS1HistoryStats15minOutLogRecordMetrics =
 	'ds1HDEs',
 	'ds1HDSes',
 	'ds1HDUas',
-	"timeCaptured"
-	//"periodicTime"
+	"timeCaptured",
+	//code change start for PMR 16450
+	"periodicTime"
+	//code change end for PMR 16450
 ];
 
 //******End of New metrics classes in SAM 2.13 pack******
