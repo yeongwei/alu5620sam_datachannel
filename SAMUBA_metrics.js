@@ -28,6 +28,7 @@ var equipmentInterfaceMetrics   = [ "receivedOctetsPeriodic",
 				    "transmittedUnicastPacketsPeriodic",
 				    "outboundPacketsDiscardedPeriodic",
 				    "outboundBadPacketsPeriodic",
+					"suspect",
 				    "timeCaptured"
 				    //"periodicTime"
 					//Added for suspect flag enhancement
@@ -45,7 +46,8 @@ var equipmentInterfaceAdditionalMetrics  = [ "receivedTotalOctetsPeriodic",
 					     "transmittedUnicastPacketsPeriodic",
 					     "transmittedMulticastPacketsPeriodic",
 					     "transmittedBroadcastPacketsPeriodic",
-					     "timeCaptured"
+					     "suspect",
+						 "timeCaptured"
 					     //"periodicTime"
 						 //Added for suspect flag enhancement
 					     //"suspect"//Not within 2.12
