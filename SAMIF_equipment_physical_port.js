@@ -263,10 +263,14 @@ function equipment_physical_port(samObject, modelInterface, className)
     	if (isConfig("inv_uses_names"))
     	{
     		subelement.label = samObject.siteName + " " +simplePortName + " " + samObject.actualSpeed.toString();
+			
+			
+			 logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "subelement.label: "+subelement.label);	
     	}
     	else
     	{
     		subelement.label = simplePortName + " " + samObject.actualSpeed.toString();
+			logP2Msg("In False : jms_speed_update_equipment_physical_port", "SAMIF", "subelement.label: "+subelement.label);
     	}
 
     	subelement.addProperty("nmVendor", "Alcatel5620SAM");
@@ -344,6 +348,22 @@ function jms_speed_update_equipment_physical_port(objectName, propColl)
         	//currentObject.commit();
 			subelement.addProperty("samSpeed", getSpeedString(propValue));
 				
+				
+				var tempLabel = subelement.label.toString();
+			var tempLabelArray = tempLabel.split(" ");
+			
+	    	if (isConfig("inv_uses_names"))
+	    	{
+	    		subelement.label = tempLabelArray[0] + " " +tempLabelArray[1] + " " + getSpeedString(propValue);
+				
+				 logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "UPDATED subelement.label: "+subelement.label);
+	    	}
+	    	else
+	    	{
+	    		subelement.label = tempLabelArray[0] + " " + getSpeedString(propValue);
+				
+				 logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "UPDATED subelement.label: "+subelement.label);
+	    	}	
 				
             logP4Msg("jms_speed_update_equipment_physical_port", "SAMIF", "samSpeed old value " + propOldValue);
             logP4Msg("jms_speed_update_equipment_physical_port", "SAMIF", "samSpeed new value " + propValue);

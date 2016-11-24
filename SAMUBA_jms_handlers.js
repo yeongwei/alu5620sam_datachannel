@@ -104,6 +104,41 @@ function jms_simple_propChange_with_mapping(className, objectName, propColl, pro
 		{
 			logP4Msg("jms_simple_propChange_with_mapping", "SAMIF", "timestamp is not set");
 		}
+		
+		
+		
+		 logP2Msg("*******PMR16515", "SAMIF", "Entering into updating LABEL******");
+		 
+		  
+			if (propArray[propName].toString() == "samActualSpeed"){
+				
+				 logP2Msg("********In true : jms_speed_update_equipment_physical_port", "SAMIF", "PROP_NAME=samActualSpeed**********");
+				 
+				 var tempLabel = subelement.label.toString();
+				 
+				var tempLabelArray = tempLabel.split(" ");
+
+				
+				
+				if (isConfig("inv_uses_names"))
+		    	{
+					
+					
+		    		subelement.label = tempLabelArray[0] + " " +tempLabelArray[1] + " " + propValue;
+					
+					 logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "UPDATED subelement.label: "+subelement.label);
+		    	}
+		    	else
+		    	{
+		    		subelement.label = tempLabelArray[0] + " " + propValue;
+					
+					 logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "UPDATED subelement.label: "+subelement.label);
+		    	}	
+			}
+	
+		
+		 logP2Msg("*******PMR16515", "SAMIF", "Exiting into updating LABEL******");
+		
 	}
 
 
