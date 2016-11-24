@@ -22,22 +22,10 @@ function process_equipment_interface_additional_stats(record)
 
     var myId;  
     var subelement = LOOKUP.get(record.monitoredObjectPointer);
- 
- 	if (record.suspect == 'true')
-	{
-		logP4Msg("process_equipment_interface_additional_stats", "SAMUBA_equipment_interface_additional", "Suspect:" + record.suspect);
-		logP4Msg("process_equipment_interface_additional_stats", "SAMUBA_equipment_interface_additional", "Discarding all interface additional stats metrics");
-		return;
-	}
-	else if (record.suspect == 'false')
-	{
-		logP4Msg("process_equipment_interface_additional_stats", "SAMUBA_equipment_interface_additional", "Suspect:" + record.suspect);
-		logP4Msg("process_equipment_interface_additional_stats", "SAMUBA_equipment_interface_additional", "Process all interface additional stats metrics");
-	}
-	
- 
- 
-	if(subelement == null)	
+  //code change start for PMR 16450 
+    var suspectFlagVal=1;
+    
+    if(subelement == null)	
 	{
 		logP5Msg("process_equipment_interface_additional_stats", "SAMUBA_equipment_interface_additional", "Skipping 0 rid for --> "+ record.monitoredObjectPointer);
 		return;
@@ -46,6 +34,37 @@ function process_equipment_interface_additional_stats(record)
 
 	myId = subelement.id;
     logP4Msg("process_equipment_interface_additional_stats", "SAMUBA_equipment_interface_additional", "ENTERING for --> "+ record.monitoredObjectPointer + " with id == " + myId);
+  //code change end for PMR 16450
+ 
+ 	if (record.suspect == 'true')
+	{
+		logP4Msg("process_equipment_interface_additional_stats", "SAMUBA_equipment_interface_additional", "Suspect:" + record.suspect);
+		logP4Msg("process_equipment_interface_additional_stats", "SAMUBA_equipment_interface_additional", "Discarding all interface additional stats metrics");
+	//code change start for PMR 16450
+		suspectFlagVal=0;		 
+		theMetric = OPERATOR.FloatMetric();		
+		_timestampName = metricClassTimestampMapping[record["className"]];
+		theMetric.timestamp = ParseTimestamp(record[_timestampName]);
+		theMetric.name = "AP~Specific~Alcatel~5620 SAM~Bulk~equipment~InterfaceStats~suspect";
+		theMetric.rid = myId;
+		theMetric.value = suspectFlagVal;
+		OPERATOR.addMetric(theMetric);	
+		logP4Msg("process_equipment_interface_additional_stats", "SAMUBA_equipment_interface_additional", "suspectFlagVal:" + suspectFlagVal);
+	//code change end for PMR 16450 
+		return;
+	}
+	else if (record.suspect == 'false')
+	{
+		logP4Msg("process_equipment_interface_additional_stats", "SAMUBA_equipment_interface_additional", "Suspect:" + record.suspect);
+		logP4Msg("process_equipment_interface_additional_stats", "SAMUBA_equipment_interface_additional", "Process all interface additional stats metrics");
+		
+		suspectFlagVal=1;
+		logP4Msg("process_equipment_interface_additional_stats", "SAMUBA_equipment_interface_additional", "suspectFlagVal:" + suspectFlagVal);
+	}
+	
+ 
+ 
+	
     for(var i = 0; i < equipmentInterfaceAdditionalMetrics.length; i++)
 	{
 	    /*theMetric = OPERATOR.FloatMetric();
@@ -55,7 +74,20 @@ function process_equipment_interface_additional_stats(record)
 	    theMetric.value = record[equipmentInterfaceAdditionalMetrics[i]];
 	    OPERATOR.addMetric(theMetric);*/
 	    //CreateSimpleMetricObject(mRid, mRecord, mPath, mTargetMetric)
-    	CreateSimpleMetricObject(myId, record, "AP~Specific~Alcatel~5620 SAM~Bulk~equipment~InterfaceAdditionalStats~", equipmentInterfaceAdditionalMetrics[i]);
+    	if(equipmentInterfaceAdditionalMetrics[i] != 'suspect'){    		
+    		CreateSimpleMetricObject(myId, record, "AP~Specific~Alcatel~5620 SAM~Bulk~equipment~InterfaceAdditionalStats~", equipmentInterfaceAdditionalMetrics[i]);
+    	}else{
+    	//code change start for PMR 16450    				 
+    		theMetric = OPERATOR.FloatMetric();		
+    		_timestampName = metricClassTimestampMapping[record["className"]];
+    		theMetric.timestamp = ParseTimestamp(record[_timestampName]);
+    		theMetric.name = "AP~Specific~Alcatel~5620 SAM~Bulk~equipment~InterfaceStats~suspect";
+    		theMetric.rid = myId;
+    		theMetric.value = suspectFlagVal;
+    		OPERATOR.addMetric(theMetric);		
+    		//logP4Msg("process_equipment_interface_additional_stats Suspect Value set 31");
+    	//code change end for PMR 16450 
+    	}
 	}
 	logP4Msg("process_equipment_interface_additional_stats", "SAMUBA_equipment_interface_additional", "LEAVING");
 }
