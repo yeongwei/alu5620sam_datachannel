@@ -66,6 +66,10 @@ function process_dhcp_subnet(samObject, modelInterface, className)
     element.collectorNumber = polled_stats_collector;
     //element.timestamp = PV.currentInputDescriptor.timestamp;
     
+	var temp = samObject.objectFullName;
+	if (temp.length > 140 ){
+    samObject.objectFullName = temp.slice(8); 
+	}
     var subName = samObject.nodeId + "_Router:" + samObject.routerId + "_DHCP6Server:" + samObject.localDhcpServerName + "_DHCPPool:" + samObject.addressPoolName + "_" + samObject.objectFullName;
     subelement = OPERATOR.subelementNamedOrNew(subName);
     subelement.name = subName;

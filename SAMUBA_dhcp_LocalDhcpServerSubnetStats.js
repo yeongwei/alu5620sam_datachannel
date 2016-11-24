@@ -26,6 +26,11 @@ function process_dhcp_localDhcpServerSubnetStats(record)
     var myId;
 	var subelement;
 	
+	var temp = record.monitoredObjectPointer;
+    if (temp.length > 140 ){
+		record.monitoredObjectPointer = temp.slice(8);
+	}
+	
 	logP4Msg("process_dhcp_localDhcpServerSubnetStats", "SAMUBA_dhcp_localDhcpServerSubnetStats", "ENTERING");   	
 	logP4Msg("process_dhcp_localDhcpServerSubnetStats", "SAMUBA_dhcp_localDhcpServerSubnetStats ---> ",  record.monitoredObjectPointer);
 	subelement = LOOKUP.get(record.monitoredObjectPointer.toString());
