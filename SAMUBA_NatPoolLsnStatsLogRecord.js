@@ -25,8 +25,18 @@ function process_nat_pool_lsnstats_log_record(record)
 		return;
 	}
 	
+	
+	
 	myId = subelement.id;    
 	logP3Msg("process_nat_pool_lsnstats_log_record", "SAMUBA_NatPoolLsnStatsLogRecord", "ENTERING for --> " + " with id == " + myId);
+	
+	
+	subelement.addProperty("samSiteName", record.monitoredObjectSiteName);
+	//subelement.addProperty("samSiteId", record.monitoredObjectSiteId);
+	if (isConfig("inv_uses_names")) 
+	{
+		subelement.label = record.monitoredObjectSiteName +"_"+ record.monitoredObjectPointer;
+	}
 	
     for(var i = 0; i < natPoolLsnStatsLogRecordMetrics.length; i++)
 	{
