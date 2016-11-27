@@ -112,28 +112,34 @@ function jms_simple_propChange_with_mapping(className, objectName, propColl, pro
 		  
 			if (propArray[propName].toString() == "samActualSpeed"){
 				
-				 logP2Msg("********In true : jms_speed_update_equipment_physical_port", "SAMIF", "PROP_NAME=samActualSpeed**********");
+				logP2Msg("********In true : jms_speed_update_equipment_physical_port", "SAMIF", "PROP_NAME=samActualSpeed**********");
 				 
-				 var tempLabel = subelement.label.toString();
+				var tempLabel = subelement.label.toString();
 				 
 				var tempLabelArray = tempLabel.split(" ");
 
 				
 				
 				if (isConfig("inv_uses_names"))
-		    	{
+		    		{
 					
 					
-		    		subelement.label = tempLabelArray[0] + " " +tempLabelArray[1] + " " + propValue;
-					
-					 logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "UPDATED subelement.label: "+subelement.label);
-		    	}
-		    	else
-		    	{
-		    		subelement.label = tempLabelArray[0] + " " + propValue;
+		    			subelement.label = tempLabelArray[0] + " " +tempLabelArray[1] + " " + propValue;
 					
 					 logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "UPDATED subelement.label: "+subelement.label);
-		    	}	
+		    		}
+		    		else
+		    		{
+		    			subelement.label = tempLabelArray[0] + " " + propValue;
+					
+					logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "UPDATED subelement.label: "+subelement.label);
+		    		}
+	
+				// Update samActualSpeedDisplay 
+				var _actualSpeedDisplayValue = propValue / 1000000;
+				_actualSpeedDisplayValue = _actualSpeedDisplayValue.toFixed(2);
+				logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "UPDATED samActualSpeedDisplay: "+_actualSpeedDisplayValue);
+				subelement.addProperty("samActualSpeedDisplay", _actualSpeedDisplayValue);	
 			}
 	
 		

@@ -292,6 +292,17 @@ function equipment_physical_port(samObject, modelInterface, className)
     				subelement.addProperty( i.toString(), samObject[ equipment_physical_port_Name[i] ].toString() );
     				logP3Msg("equipment_physical_port","SAMIF", "Property:"+i+"value:"+samObject[equipment_physical_port_Name[i]]);
     			}
+	
+			// if actualSpeed then need to convert to Gbps
+			var _actualSpeed = "actualSpeed"
+			if (equipment_physical_port_Name[i] == _actualSpeed) 
+			{
+				// logP3Msg("equipment_physical_port","SAMIF", "actualSpeed value before division: " + samObject[_actualSpeed]);
+				var _actualSpeedDisplayVal = samObject[_actualSpeed] / 1000000;
+				_actualSpeedDisplayVal = _actualSpeedDisplayVal.toFixed(2);
+				logP3Msg("equipment_physical_port","SAMIF", "samActualSpeedDisplay: " + _actualSpeedDisplayVal);
+				subelement.addProperty("samActualSpeedDisplay", _actualSpeedDisplayVal );
+			}
     		}
     	}
 
