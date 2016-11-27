@@ -691,6 +691,7 @@ function setup_combined_metric_filters() {
 
 	setup_combined_filter_entry("equipment.HardwareTemperatureLogRecord", "include_hw_temp", "exclude_hw_temp");
 	setup_combined_filter_entry("nat.IsaMemberUsageStatsLogRecord", "include_isa_mem_usg_stats", "exclude_isa_mem_usg_stats");
+	setup_combined_filter_entry("nat.NatIsaResourceStatsLogRecord", "include_nat_isa_resource_stats", "exclude_nat_isa_resource_stats");
 	setup_combined_filter_entry("dhcp.LocalDhcp6ServerPrefixStatsLogRecord", "include_local_dhcp6_serverprefixstats", "exclude_local_dhcp6_serverprefixstats");
 	setup_combined_filter_entry("dhcp.LocalDhcpServerSubnetStatsLogRecord", "include_local_dhcp_serversubnetstats", "exclude_local_dhcp_serversubnetstats");
 	

@@ -278,6 +278,7 @@ var ubaMetricHandlers = {
 	"equipment.SystemCpuMonStatsLogRecord": process_equipment_SystemCpuMonStats,
 	"equipment.HardwareTemperatureLogRecord": process_equipment_hw_temprature_stats,
 	"nat.IsaMemberUsageStatsLogRecord": process_nat_IsaMemberUsageStats,
+	"nat.NatIsaResourceStatsLogRecord": process_nat_isa_resource_stats,
 	
 	//HW Environment
 	"equipment.HwEnvironment": process_equipment_hw_environment_stats, //01 April 2013
@@ -418,6 +419,7 @@ var metricClassTimestampMapping = {
 	"equipment.SystemCpuMonStatsLogRecord": "timeCaptured",
 	"equipment.HardwareTemperatureLogRecord": "timeCaptured",
 	"nat.IsaMemberUsageStatsLogRecord": "timeCaptured",
+	"nat.NatIsaResourceStatsLogRecord": "timeCaptured",
 	
 	//HW Environment
 	"equipment.HwEnvironment": "mtosiTime",//Special case

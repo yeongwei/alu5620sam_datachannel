@@ -179,6 +179,7 @@ PV.importScript("alcatel_5620_sam_log2file/SAMUBA_tdmequipment_DS1HistoryStats15
 PV.importScript("alcatel_5620_sam_log2file/SAMUBA_equipment_system_cpumonstats.js");
 PV.importScript("alcatel_5620_sam_log2file/SAMUBA_hw_temperature.js");
 PV.importScript("alcatel_5620_sam_log2file/SAMUBA_IsaMemberUsageStats.js");
+PV.importScript("alcatel_5620_sam_log2file/SAMUBA_NatIsaResourceStats.js");
 PV.importScript("alcatel_5620_sam_log2file/SAMUBA_dhcp_LocalDhcp6ServerPrefixStats.js");
 PV.importScript("alcatel_5620_sam_log2file/SAMUBA_dhcp_LocalDhcpServerSubnetStats.js");
 

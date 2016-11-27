@@ -845,6 +845,10 @@ var additional_ping_test_metrics =
 	"packetsSent"
 ];
 
-
+var natIsaResourceStatsMetrics = [
+	"statsName",
+	"statsValue",
+	"statsMaxValue"
+];
 
 
