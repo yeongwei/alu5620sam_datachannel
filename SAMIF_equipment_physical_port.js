@@ -255,7 +255,7 @@ function equipment_physical_port(samObject, modelInterface, className)
     	subelement.family = "5620_SAM_PhysicalPort" ;
     	subelement.invariant = samObject.objectFullName;
     	subelement.instance = "If<" + simplePortName +">";
-    	//subelement.timestamp = samObject.timestamp;
+    	subelement.timestamp = samObject.timestamp;
     
     	//logP3Msg("equipment_physical_port","SAMIF", "Timestamp:"+subelement.timestamp);
 
