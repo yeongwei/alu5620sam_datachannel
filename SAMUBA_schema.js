@@ -68,55 +68,37 @@ function newUBAInit() {
 /*
  * 25 March 2013: IMPORTANT!!! Current UBA's schema that initializes as CSV
  */
-function createSAMCSVUBASchema(schema_name, filePeriod, precedence, noNewInputLimit) 
-{
-	logP4Msg("createSAMUBASchema", schema_name, "Entering the create UBA schema function");
+function createSAMCSVUBASchema(schema_name, filePeriod, precedence, noNewInputLimit) {
+	logP4Msg("createSAMUBASchema", schema_name, "Entering");
 	var _pvConfiguration = PV.configuration;
 	var upperCaseSchemaName = schema_name.toUpperCase();
 	var _deleteOnAcquire = _pvConfiguration['ALCATEL_5620_SAM_LOG2FILE'][upperCaseSchemaName]['DELETEONACQUIRE'];
-	if(_deleteOnAcquire == 'TRUE')
-	{
+	if(_deleteOnAcquire == 'TRUE') {
 		_deleteOnAcquire = true;
-	}
-	else
-	{
+	} else {
 		_deleteOnAcquire = false;
 	} 
-	logP4Msg("createSAMUBASchema", schema_name, "Creating schema with deleteOnAcquire -> " + _deleteOnAcquire);
+	logP4Msg("createSAMUBASchema", schema_name, "deleteOnAcquire: " + _deleteOnAcquire);
 	    
-    var uba_schema = PV.TextInputSchema(
-		schema_name,
-		{
-			//filePeriod: 900,
+    	var uba_schema = PV.TextInputSchema(schema_name, {
 			filePeriod: parseInt(app_config_value("FILE_PERIOD")),
-			//deleteOnAcquire: true,
 			deleteOnAcquire: _deleteOnAcquire,
 			heartbeatOnLastTimestamp: false,
 			multiFileJoin: true,
-			//multiFileJoin: false,
-            noNewInputLimit: 2,
+            		noNewInputLimit: 2,
 			precedence: 3,
 
-			parseURI: function(source) 
-			{
-				logP3Msg("parseURI", "*****","Source: "+source);	
-				//25 March 2013: No longer interested with filename's timestamp
-				//25 March 2013 3:13PM: Inventory classes could use the filename timestamp???
+			parseURI: function(source) {
 			    source.timestamp=dateFromSAMFilename(source.localName);
-			    //logStatus("source.localName", source.localName);
-		    },//End parseURI
-			onOpen: function(source) 
-			{
+		    	},
+			onOpen: function(source) {
 				logP3Msg("onOpen", schema_name, "Opening the file" + source.localName);
-				clearHandlers();//This is just so that temporaryDispatchRoutine do not fire the incorrect handlers
-		    },//End onOpen
-			onClose: function(source) 
-			{
+				clearHandlers(); // Avoid temporaryDispatchRoutine firing incorrect handlers
+		    	},
+			onClose: function(source) { 
 				logP3Msg("onClose", schema_name, "Closing the file" + source.localName);
-		    }//End onClose
-
-		}//End schema_name
-	);//End TextInputSchema
+		    	}
+		}); // End TextInputSchema
 
     if (isDef(filePeriod)) 
     {
@@ -164,11 +146,10 @@ function createSAMCSVUBASchema(schema_name, filePeriod, precedence, noNewInputLi
 
     uba_schema.add(uba_record_schema);
 
-    logP4Msg("createSAMUBASchema", schema_name, "File period: " + uba_schema.filePeriod);
-    logP4Msg("createSAMUBASchema", schema_name, "Precedence: " + uba_schema.precedence);
-    logP4Msg("createSAMUBASchema", schema_name, "No New Input Limit: " + uba_schema.noNewInputLimit);
-
-    logP4Msg("createSAMUBASchema", schema_name, "Exiting the create UBA schema function");
+    logP4Msg("createSAMUBASchema", schema_name, "filePeriod: " + uba_schema.filePeriod);
+    logP4Msg("createSAMUBASchema", schema_name, "precedence: " + uba_schema.precedence);
+    logP4Msg("createSAMUBASchema", schema_name, "noNewInputLimit: " + uba_schema.noNewInputLimit);
+    logP4Msg("createSAMUBASchema", schema_name, "Exiting");
 
     return(uba_schema);
 }
@@ -364,47 +345,24 @@ function temporaryDispatchRoutine (record)
 /*
  * 28 March 2013: Assign class name as property / attribute into the record object for timestamp parameter evaluation
  */
-function assignFields(record, classname, fieldNames, classObject) 
-{
-	
-    var i,value;
+function assignFields(record, classname, fieldNames, classObject) {
+    var logMsg = "classname: " + classname + " record: " + record + " ";
 
-    logP3Msg("assignFields", "classname", classname);
-    
-	   logP3Msg("assignFields", "record", record);
-	
-    for(i = 0; i < fieldNames.length; i++) 
-    {
-    	value = record.fields[i+1];
-    	//25 March 2013: This is drop fields with no values aka ""
-    	if (value != "") 
-    	{
-    		//The field 0 is the record identifier(Zero Record), so i+1
+    for(var i = 0; i < fieldNames.length; i++) { 
+    	var value = record.fields[i+1]; //The field 0 is the record identifier(Zero Record), so i+1
+    	if (value != "") { // 25 March 2013: Drop fields with no values aka ""
     		record[fieldNames[i]] = value;
     	}
     }
-    
-    //logP3Msg("assignFields", "record", "Looking into parsed record");
-    //dump_samObject(record);
-    
-    //logP3Msg("assignFields", "DEBUG", "Putting classname into record object");
-    //28 March 2013: For timestamp attribute name lookup purpose
+
     record["className"] = classname;
     
-    //ONLY FOR INVENTORY USE. Looking for mtosiTime
-    logP3Msg("assignFields", "DEBUG", "record.mtosiTime -> " + record.mtosiTime);
-    
-    //Looking at timestamp attribute all the time before anything happens
-    logP6Msg("assignFields", "DEBUG", "record.timestamp -> " + record.timestamp); 
-    
-    //Putting mtosiTime as timestamp
-    if(isDef(record.mtosiTime) == true)
-    {
-    	 logP3Msg("assignFields", "DEBUG", "mtosiTime FOUND!!! Parsing as inventory records.");
-    	 record.timestamp = ParseTimestamp(record.mtosiTime);
+    if(isDef(record.mtosiTime) == true) { // if mtosiTime exist then records are inventory
+	record.timestamp = ParseTimestamp(record.mtosiTime);
+   	logMsg += "inventory: true";
     }
     
-    logP3Msg("assignFields", "DEBUG", "Checking on record.timestamp -> " + record.timestamp); 
+    logP4Msg("assignFields", "SAMUBA_schema", "Assigned fields: " + logMsg); 
     
 }
 
