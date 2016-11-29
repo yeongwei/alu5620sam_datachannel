@@ -31,19 +31,18 @@ for( var i in nat_natpool_Name)
 	reverse_nat_natpool_Name[nat_natpool_Name[i]] = i;
 }
 
-function nat_natpool(samObject, modelInterface)
-{
-	logP3Msg("nat_natpool", "SAMIF", "entered nat_natpool" );
+function nat_natpool(samObject, modelInterface) {
+	logP4Msg("nat_natpool", "SAMIF_nat_natpool", "Entering");
+	
 	var element;
 	var subelement;
-
-		var monobj = samObject.objectFullName;
-		var siteIdExp	= new RegExp('(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)');
-		var value = siteIdExp.exec(monobj);
-		var siteId = value[0];
+	var monobj = samObject.objectFullName;
+	var siteIdExp	= new RegExp('(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)');
+	var value = siteIdExp.exec(monobj);
+	var siteId = value[0];
+	
 	element = OPERATOR.elementNamedOrNew("5620_SAM_NATPool_Node_"+siteId);
 	element.state = true;
-	//element.name = samObject.routerId.toString();
 	element.origin = "SAM" ;
 	element.collectorNumber = polled_stats_collector;
 
@@ -55,43 +54,25 @@ function nat_natpool(samObject, modelInterface)
 	subelement.family = "5620_SAM_NATPool" ;
 	subelement.invariant = samObject.objectFullName;
 	subelement.instance = samObject.objectFullName;
-	//subelement.timestamp = samObject.timestamp;
-	
-	
 
-	logP3Msg("nat_natpool", "SAMIF", "element and subelement created" +subelement);
+	logP3Msg("nat_natpool", "SAMIF_nat_natpool", "Subelement created: " + subelement);
 	
-		
-	//logP3Msg("nat_natpool", "SAMIF", "siteId" +siteId);
-		
-	if (isConfig("inv_uses_names")) 
-	{
+	if (isConfig("inv_uses_names")) {
 		subelement.label = siteId+" "+samObject.objectFullName;
-	}
-	else 
-	{
+	} else {
 		subelement.label = samObject.objectFullName;
 	}
+
 	subelement.addProperty("nmVendor", "Alcatel5620SAM");
 	subelement.addProperty("samSiteId", siteId);
-
-	//This property added for TCR enablement, it will be use for Cognos resource grouping
 	subelement.addProperty("samFamilyName", "5620_SAM_NATPool");
-	
 
-
-	for( var i in nat_natpool_Name) 
-	{
-		if ( samObject[ nat_natpool_Name[i] ] != undefined )
-		{
+	for (var i in nat_natpool_Name) { 
+		if (samObject[nat_natpool_Name[i]] != undefined) {
 			subelement.addProperty( i.toString(), samObject[ nat_natpool_Name[i] ].toString() );
 		}    
 	}
 			
-	//subelement.timestamp = modelInterface.currentDate;
 	subelement.element = element;
-	//element.addSubelement(subelement);
-	//possible_inline_commit(modelInterface);
-	logP3Msg("nat_natpool", "SAMIF", "Exiting nat_natpool" );
-}//natpool_lsnstats_log_record
-
+	logP4Msg("nat_natpool", "SAMIF_nat_natpool", "Exiting");
+}

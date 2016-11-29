@@ -278,44 +278,34 @@ function equipment_physical_port(samObject, modelInterface, className)
     	//This property added for TCR enablement, it will be use for Cognos resource grouping
     	subelement.addProperty("samFamilyName", "5620_SAM_PhysicalPort");
 
-    	for( var i in equipment_physical_port_Name) 
-    	{
-    		if ( samObject[ equipment_physical_port_Name[i] ] != undefined )
-    		{
-    			// Speed requires a lookup
-    			if (equipment_physical_port_Name[i] == "speed")
-    			{
-    				subelement.addProperty(i.toString(), getSpeedString(samObject[ equipment_physical_port_Name[i] ].toString()));
-    			}
-    			else
-    			{
-    				subelement.addProperty( i.toString(), samObject[ equipment_physical_port_Name[i] ].toString() );
-    				logP3Msg("equipment_physical_port","SAMIF", "Property:"+i+"value:"+samObject[equipment_physical_port_Name[i]]);
+	var logMsg = "";
+    	for (var i in equipment_physical_port_Name) { 
+    		if (samObject[ equipment_physical_port_Name[i] ] != undefined) {
+    			if (equipment_physical_port_Name[i] == "speed") {
+				var _speedString = getSpeedString(samObject[equipment_physical_port_Name[i]].toString());
+    				subelement.addProperty(i.toString(), _speedString);
+				logMsg += "speed: " + _speedString + " ";
+    			} else {
+				var _value = samObject[equipment_physical_port_Name[i]].toString();
+    				subelement.addProperty(i.toString(), _value);
+				logMsg += i.toString() + ": " +  _value + " ";	
     			}
 	
 			// if actualSpeed then need to convert to Gbps
-			var _actualSpeed = "actualSpeed"
-			if (equipment_physical_port_Name[i] == _actualSpeed) 
-			{
-				// logP3Msg("equipment_physical_port","SAMIF", "actualSpeed value before division: " + samObject[_actualSpeed]);
+			var _actualSpeed = "actualSpeed";
+			if (equipment_physical_port_Name[i] == _actualSpeed) {
 				var _actualSpeedDisplayVal = samObject[_actualSpeed] / 1000000;
 				_actualSpeedDisplayVal = _actualSpeedDisplayVal.toFixed(2);
-				logP3Msg("equipment_physical_port","SAMIF", "samActualSpeedDisplay: " + _actualSpeedDisplayVal);
+				logMsg += "samActualSpeedDisplay: " + _actualSpeedDisplayVal + " "; 
 				subelement.addProperty("samActualSpeedDisplay", _actualSpeedDisplayVal );
 			}
     		}
     	}
-
-    	//subelement.timestamp = modelInterface.currentDate;
-    	//logStatus("nodeId2", samObject.nodeId);
+	logP3Msg("equipment_physical_port", "SAMIF_equipment_physical_port", "Subelement create: " + subelement + " " + logMsg);
 
     	subelement.element = element; 
-    	//element.addSubelement(subelement);
-    	//logStatus("nodeId3", samObject.nodeId);
-    	//possible_inline_commit(modelInterface);
     }
- } 
-//} 
+} 
 
 //16 January 2013: Use record object instead of objectFullName
 //function jms_delete_equipment_physical_port(objectFullName)
