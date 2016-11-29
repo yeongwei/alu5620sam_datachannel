@@ -137,7 +137,13 @@ function jms_simple_propChange_with_mapping(className, objectName, propColl, pro
 	
 				// Update samActualSpeedDisplay 
 				var _actualSpeedDisplayValue = propValue / 1000000;
-				_actualSpeedDisplayValue = _actualSpeedDisplayValue.toFixed(2);
+				if (_actualSpeedDisplayValue == 1) {
+					_actualSpeedDisplayValue = "1.00";
+				} else if (_actualSpeedDisplayValue == 0) {
+					_actualSpeedDisplayValue = "0.00";
+				} else {
+					_actualSpeedDisplayValue = _actualSpeedDisplayValue.toFixed(2);
+				}
 				logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "UPDATED samActualSpeedDisplay: "+_actualSpeedDisplayValue);
 				subelement.addProperty("samActualSpeedDisplay", _actualSpeedDisplayValue);	
 			}
