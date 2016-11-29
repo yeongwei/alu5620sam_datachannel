@@ -30,6 +30,12 @@ function process_nat_isa_resource_stats(record) {
 			logP4Msg(functionName, fileName, "Metrics not found: " + natIsaResourceStatsMetrics[i]);
 		}
  	}
+
+	if (record["statsValue"] && record["statsMaxValue"]) {
+		var statsUtilizationValue = (record["statsValue"] / record["statsMaxValue"]) * 100;
+		record["statsUtilizationValue"] = statsUtilizationValue;
+		CreateSimpleMetricObject(myId, record, "AP~Specific~Alcatel~5620 SAM~Bulk~nat~IsaResources~", "statsUtilizationValue");
+	}
 	
 	logP4Msg(functionName, fileName, "LEAVING");
 }
