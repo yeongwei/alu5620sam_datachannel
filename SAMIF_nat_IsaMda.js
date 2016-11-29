@@ -27,20 +27,16 @@ for( var i in nat_IsaMda_Name)
 	reverse_nat_IsaMda_Name[nat_IsaMda_Name[i]] = i;
 }
 
-function nat_IsaMda(samObject, modelInterface, className)
-{
-	
-	logP3Msg("nat_IsaMda", "SAMIF"  , "entered nat_IsaMda");
+function nat_IsaMda(samObject, modelInterface, className) {
+    logP4Msg("nat_IsaMda", "SAMIF_nat_IsaMda"  , "Entering");
     var element;
     var subelement;
 
-    //element = OPERATOR.elementNamedOrNew(samObject.siteId.toString());
     element = OPERATOR.elementNamedOrNew(samObject.siteName);
     element.name = samObject.siteName;
     element.state = true;
     element.origin = "SAM" ;
     element.collectorNumber = polled_stats_collector;
-    //element.timestamp = PV.currentInputDescriptor.timestamp;
 
     subelement = OPERATOR.subelementNamedOrNew(samObject.objectFullName);
     subelement.name = samObject.objectFullName;
@@ -49,25 +45,6 @@ function nat_IsaMda(samObject, modelInterface, className)
     subelement.family = "5620_SAM_Mda";
     subelement.invariant = samObject.objectFullName;
     subelement.instance = samObject.objectFullName;
-	//subelement.timestamp = samObject.timestamp;
-    
-    
-//    element = modelInterface.Element();
-//    element.state = true;
-//    element.name = samObject.siteName.toString();
-//    element.origin = "SAM" ;
-//    element.collectorNumber = polled_stats_collector;
-//
-//    subelement = modelInterface.Subelement();
-//      
-//    //var simplePortName = samObject.siteId.toString() + "_" + samObject.shelfId.toString() + "/" + samObject.cardSlotId.toString() + "/" + samObject.daughterCardSlotId.toString() + "/" + samObject.portId.toString();
-//
-//    subelement.name = samObject.objectFullName;
-//    subelement.state = true;
-//    subelement.origin = "SAM";
-//    subelement.family = "5620_SAM_Mda";
-//    subelement.invariant = samObject.objectFullName;
-//    subelement.instance = samObject.objectFullName;
 
     if (isConfig("inv_uses_names"))
     {
@@ -83,21 +60,21 @@ function nat_IsaMda(samObject, modelInterface, className)
     //This property added for TCR enablement, it will be use for Cognos resource grouping
     subelement.addProperty("samFamilyName", "5620_SAM_Mda");
 
-    for( var i in nat_IsaMda_Name) 
-    {
-    	if(i.toString() == "samSiteId" && samObject.siteName != undefined){
-			 // This is Removed because as per latest CLD this property does not exist
-			 //subelement.addProperty("samSiteId", samObject.siteName);
-		 }else if ( samObject[ nat_IsaMda_Name[i] ] != undefined ){
-             subelement.addProperty( i.toString(), samObject[ nat_IsaMda_Name[i] ].toString() );
-             logP4Msg("nat_IsaMda", "addProperty", "property: " + i.toString() +" value: "+ samObject[ nat_IsaMda_Name[i] ].toString() );
- 	    }
+    var logMsg = "";
+    for (var i in nat_IsaMda_Name) { 
+    	if (i.toString() == "samSiteId" && samObject.siteName != undefined) {
+	 // This is Removed because as per latest CLD this property does not exist
+	 //subelement.addProperty("samSiteId", samObject.siteName);
+	} else if (samObject[nat_IsaMda_Name[i]] != undefined ) {
+		var _property = i.toString();
+		var _value = samObject[nat_IsaMda_Name[i]].toString();	
+             	subelement.addProperty(_property, _value);
+		logMsg += _property + ": " + _value + " ";
+	}
     }
+    logP3Msg("nat_IsaMda", "SAMIF_nat_IsaMda", "Subelement created: " + subelement + " " + logMsg);
     
     subelement.element = element;
-//subelement.timestamp = modelInterface.currentDate;
-//    element.addSubelement(subelement);
-//    possible_inline_commit(modelInterface);
     
 } 
 
