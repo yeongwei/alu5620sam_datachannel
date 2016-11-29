@@ -295,7 +295,13 @@ function equipment_physical_port(samObject, modelInterface, className)
 			var _actualSpeed = "actualSpeed";
 			if (equipment_physical_port_Name[i] == _actualSpeed) {
 				var _actualSpeedDisplayVal = samObject[_actualSpeed] / 1000000;
-				_actualSpeedDisplayVal = _actualSpeedDisplayVal.toFixed(2);
+				if (_actualSpeedDisplayVal == 1) {
+					_actualSpeedDisplayVal = "1.00";
+				} else if (_actualSpeedDisplayVal == 0) { 
+					 _actualSpeedDisplayVal = "0.00";
+				} else {
+					_actualSpeedDisplayVal = _actualSpeedDisplayVal.toFixed(2);
+				}
 				logMsg += "samActualSpeedDisplay: " + _actualSpeedDisplayVal + " "; 
 				subelement.addProperty("samActualSpeedDisplay", _actualSpeedDisplayVal );
 			}
