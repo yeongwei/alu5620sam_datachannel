@@ -294,13 +294,11 @@ function equipment_physical_port(samObject, modelInterface, className)
 			// if actualSpeed then need to convert to Gbps
 			var _actualSpeed = "actualSpeed";
 			if (equipment_physical_port_Name[i] == _actualSpeed) {
-				var _actualSpeedDisplayVal = samObject[_actualSpeed] / 1000000;
-				if (_actualSpeedDisplayVal == 1) {
-					_actualSpeedDisplayVal = "1.00";
-				} else if (_actualSpeedDisplayVal == 0) { 
-					 _actualSpeedDisplayVal = "0.00";
-				} else {
-					_actualSpeedDisplayVal = _actualSpeedDisplayVal.toFixed(2);
+				var _actualSpeedDisplayVal = new Number(samObject[_actualSpeed] / 1000000).toFixed(2);
+				_actualSpeedDisplayVal = _actualSpeedDisplayVal.toString();
+				var _regexp = new RegExp("\\.$"); // e.g. 1., 3.
+				if (_regexp.test(_actualSpeedDisplayVal)) {
+					_actualSpeedDisplayVal = _actualSpeedDisplayVal + "0";
 				}
 				logMsg += "samActualSpeedDisplay: " + _actualSpeedDisplayVal + " "; 
 				subelement.addProperty("samActualSpeedDisplay", _actualSpeedDisplayVal );

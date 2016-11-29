@@ -136,14 +136,12 @@ function jms_simple_propChange_with_mapping(className, objectName, propColl, pro
 		    		}
 	
 				// Update samActualSpeedDisplay 
-				var _actualSpeedDisplayValue = propValue / 1000000;
-				if (_actualSpeedDisplayValue == 1) {
-					_actualSpeedDisplayValue = "1.00";
-				} else if (_actualSpeedDisplayValue == 0) {
-					_actualSpeedDisplayValue = "0.00";
-				} else {
-					_actualSpeedDisplayValue = _actualSpeedDisplayValue.toFixed(2);
-				}
+				var _actualSpeedDisplayValue = new Number(propValue / 1000000).toFixed(2);
+				_actualSpeedDisplayValue = _actualSpeedDisplayValue.toString();
+                                var _regexp = new RegExp("\\.$"); // e.g. 1., 3.
+                                if (_regexp.test(_actualSpeedDisplayValue)) {
+                                        _actualSpeedDisplayValue = _actualSpeedDisplayValue + "0";
+                                }
 				logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "UPDATED samActualSpeedDisplay: "+_actualSpeedDisplayValue);
 				subelement.addProperty("samActualSpeedDisplay", _actualSpeedDisplayValue);	
 			}
