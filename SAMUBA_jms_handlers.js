@@ -11,157 +11,89 @@
 // optional and is used only if you need to map numerical values received via
 // JMS to text, for properties.
 
-function jms_simple_propChange_with_mapping(className, objectName, propColl, propArray, mapArray)
-{
-	//var myId = 0;
-	//var currentObject;
-	//var qmap;
-	var changed, mapped;
-	//var i;
-	var propName, propValue, mapValue;
-	var subelement;
+function jms_simple_propChange_with_mapping(className, objectName, propColl, propArray, mapArray) {
+	var _functionName = "jms_simple_propChange_with_mapping";
+	var _componentName = "SAMIF";
 
-	logP5Msg("jms_simple_propChange_with_mapping", "SAMIF", "entered");	
-
-	//myId = modelInterface.idForName(objectName);
-
-	subelement = LOOKUP.get(objectName);
-	if(subelement == null)	
-	{
-		logP5Msg("jms_simple_propChange_with_mapping", "LOOKUP", "Skipping 0 rid for --> "+ subelement);
+	var subelement = LOOKUP.get(objectName);
+	if (subelement == null){	
+		logP4Msg(_functionName, _componentName, "Object not found for " + subelement);
 		return;
 	}
-	//timestamp = Math.floor(record.timeCaptured/1000);
-	// myId = subelement.id;  
+	
+	var _log = "";	
+	var changed = 0;
+	
+	// logP3Msg(_functionName, _componentName, "Input data: " + propColl);
+	// logP3Msg(_functionName, _componentName, "Input data length: " + propColl.length); // Length should almost always be 1
+	for (var i in propColl) {
+		var propName = propColl[i].attributeName;
+		var propValue = propColl[i].newvalue;
 
-	logP5Msg("jms_simple_propChange_with_mapping", "SAMIF", "object: "+subelement);	
-	//logP5Msg("jms_simple_propChange_with_mapping", "SAMIF", "myId = "+myId);
-
-	//currentObject = modelInterface.Subelement();
-	//currentObject.id = myId; 
-	changed = 0;
-	    
-	//nilStatus("jms_simple_propChange_with_mapping currentObject", currentObject);
-
-	//for (var i in propColl) {
-	//logP4Msg("jms_simple_propChange_with_mapping", "SAMIF", "i="+i);
-	//logStatus("jms_simple_propChange_with_mapping propList", propColl[i].attributeName);
-	//logStatus("jms_simple_propChange_with_mapping propValue", propColl[i].newvalue);
-	//}
-
-
-	for(var i in propColl)
-	{    
-		propName = propColl[i].attributeName;
-		//propValue = propColl[i].newvalue;
-		propValue = propColl[i].newvalue;
-
-        logP4Msg("jms_simple_propChange_with_mapping", "SAMIF", "propName: "+propName);
-		logP4Msg("jms_simple_propChange_with_mapping", "SAMIF", "propValue: "+propValue);
-		logStatus("jms_simple_propChange_with_mapping propArray", propArray[propName]);//E.g. reserve_lag_interface_name
-
-		mapped=0;
-		if (isDef(mapArray))
-        {
-		    if (isDef(mapArray[propName]))
-            {
+		_log += "propName: " + propName + " ";
+		_log += "propValue: " + propValue + " ";		
+	
+		var mapped = 0; // flag to check if attribute value has to be mapped to some other values
+		if (isDef(mapArray)) {
+		    if (isDef(mapArray[propName])) {
 				mapValue = mapArray[propName](objectName, propName, propValue);
-				changed=1;
-		        mapped=1;
-				logP4Msg("jms_simple_propChange_with_mapping", "SAMIF", objectName+'==>['+propName+']::'+propValue);	
-				logP4Msg("jms_simple_propChange_with_mapping", "SAMIF", propValue+" ==> "+mapValue);
-				//As not all inventory class share the same property array
-				if(isDef(propArray[propName]))//To handle undefined array object
-				{
-					logP4Msg("jms_simple_propChange_with_mapping", "SAMIF", propArray[propName]);
-					//currentObject.addProperty(propArray[propName].toString(), mapValue);
+				changed = 1;
+		        	mapped = 1;
+				_log += "mapValue: " + mapValue + " ";	
+					
+				if (isDef(propArray[propName])) { // make sure that propName is a valid SAM attribute and supported by TP
 					subelement.addProperty(propArray[propName].toString(), mapValue);
 				}
 			}
 		}
 
-		//If there is no mapping array, then just do the straight property change
-		if ((mapped == 0) && (isDef(propArray[propName]))) //a property we care about
-		{ 
-			changed=1;
-			//debug	logP5Msg("jms_simple_propChange_with_mapping", "SAMIF", objectName+'==>['+propName+']::'+propValue);	
-			//debug	logP5Msg("jms_simple_propChange_with_mapping", "SAMIF", propArray[propName]);
-			//currentObject.addProperty(propArray[propName].toString(), propValue);
+		// If there is no need to map value to some other values then just do the straight property change
+		if ((mapped == 0) && (isDef(propArray[propName]))) { // propArray is usually the variable name starts with reverse_*
+			changed = 1;
 			subelement.addProperty(propArray[propName].toString(), propValue);
 		}
-		else 
-		{
-			//debug	logP5Msg("jms_simple_propChange_with_mapping", "SAMIF", propName+": skipping");	
+		
+		_log += "changed: " + changed + " ";
+		_log += "mapped: " + mapped + " ";
+		
+		if (propColl[i].timestamp) {
+			subelement.timestamp = propColl[i].timestamp;
 		}
 		
-		//10 January 2013 - Update JMS timestamp
-		if(propColl[i].timestamp)//aka record.timestamp = <int>
-		{
-			logP4Msg("jms_simple_propChange_with_mapping", "SAMIF", "timestamp -> " + propColl[i].timestamp);
-			//subelement.timestamp = propColl[i].timestamp;
-		}
-		else
-		{
-			logP4Msg("jms_simple_propChange_with_mapping", "SAMIF", "timestamp is not set");
-		}
-		
-		
-		
-		 logP2Msg("*******PMR16515", "SAMIF", "Entering into updating LABEL******");
-		 
-		  
-			if (propArray[propName].toString() == "samActualSpeed"){
-				
-				logP2Msg("********In true : jms_speed_update_equipment_physical_port", "SAMIF", "PROP_NAME=samActualSpeed**********");
+		// PMR 16515 START
+		if (isDef(propArray[propName])) {
+			if (propArray[propName].toString() == "samActualSpeed") {
 				 
 				var tempLabel = subelement.label.toString();
-				 
 				var tempLabelArray = tempLabel.split(" ");
 
-				
-				
-				if (isConfig("inv_uses_names"))
-		    		{
-					
-					
-		    			subelement.label = tempLabelArray[0] + " " +tempLabelArray[1] + " " + propValue;
-					
-					 logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "UPDATED subelement.label: "+subelement.label);
-		    		}
-		    		else
-		    		{
+				if (isConfig("inv_uses_names")) {
+					subelement.label = tempLabelArray[0] + " " + tempLabelArray[1] + " " + propValue;
+		    		} else {
 		    			subelement.label = tempLabelArray[0] + " " + propValue;
-					
-					logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "UPDATED subelement.label: "+subelement.label);
 		    		}
+				
+				_log += "label: " + subelement.label + " ";
 	
 				// Update samActualSpeedDisplay 
 				var _actualSpeedDisplayValue = new Number(propValue / 1000000).toFixed(2);
 				_actualSpeedDisplayValue = _actualSpeedDisplayValue.toString();
-                                var _regexp = new RegExp("\\.$"); // e.g. 1., 3.
-                                if (_regexp.test(_actualSpeedDisplayValue)) {
-                                        _actualSpeedDisplayValue = _actualSpeedDisplayValue + "0";
-                                }
-				logP2Msg("In true : jms_speed_update_equipment_physical_port", "SAMIF", "UPDATED samActualSpeedDisplay: "+_actualSpeedDisplayValue);
-				subelement.addProperty("samActualSpeedDisplay", _actualSpeedDisplayValue);	
+                        	var _regexp = new RegExp("\\.$"); // e.g. 1., 3.
+                        	if (_regexp.test(_actualSpeedDisplayValue)) {
+                        	 	_actualSpeedDisplayValue = _actualSpeedDisplayValue + "0";
+                        	}
+				subelement.addProperty("samActualSpeedDisplay", _actualSpeedDisplayValue);
+				_log += "samActualSpeedDisplay: " + _actualSpeedDisplayValue + " ";	
 			}
-	
+		}
+		// PMR 16515 END
 		
-		 logP2Msg("*******PMR16515", "SAMIF", "Exiting into updating LABEL******");
-		
+		logP3Msg(_functionName, _componentName, _log);
 	}
 
-
-	logStatus("jms_simple_propChange_with_mapping changed", changed);
-	if (changed == 1) 
-	{
-		//debug	logP5Msg("jms_simple_propChange_with_mapping", "SAMIF", "About to commit subelement);
-		//currentObject.commit();
-		//debug	logP5Msg("jms_simple_propChange_with_mapping", "SAMIF", "Committed subelement");
+	if (changed == 1) {
+		OPERATOR.addSubelement(subelement);
 	}
-
-	//definite_commit(modelInterface);
-	logP4Msg("jms_simple_propChange_with_mapping", "SAMIF", "Committed model interface");
 }
 
 //use record instead of objectName since timestamp not updated automatically
@@ -300,43 +232,24 @@ function accessInterfaceJmsUpdate(className, objectName, propColl, propArray, ma
 }
 
 
-function jmsAtrributeValueChangeDispatchHandler(record, modelInterface, className, classObject) 
-{
-
-    var propColl=[];
+function jmsAtrributeValueChangeDispatchHandler(record, modelInterface, className, classObject) {
+	var _log = "";
+	var propColl=[];
 	
-	//We should maybe change the input fields to match this
-    record.newvalue = record.newValue;
-    record.oldvalue = record.oldValue;
+	record.newvalue = record.newValue;
+	record.oldvalue = record.oldValue;
 	
-	logP3Msg("JMS_HANDLER", "SAMIF", "JMS_HANDLER " + modelInterface);
+	propColl[0] = record; // Contains the newValue, oldValue, and attributeName //IMPORTANT INDEX!!!
 
-	//dump_samObject(record);
-	//dump_samObject(classObject);
-    propColl[0]=record;// Contains the newValue, oldValue, and attributeName//IMPORTANT INDEX!!!
-
-	logP3Msg("jmsAttributeValueChangeDispatchHandler", "SAMUBA", "ClassName:" + className);
-    logP3Msg("jmsAttributeValueChangeDispatchHandler", "SAMUBA", "objectName:" + record.objectFullName);
-    logP3Msg("jmsAttributeValueChangeDispatchHandler", "SAMUBA", "propColl:" + propColl);
-    logP3Msg("jmsAttributeValueChangeDispatchHandler", "SAMUBA", "classObject.dataType:" + classObject.dataType);
-    logP3Msg("jmsAttributeValueChangeDispatchHandler", "SAMUBA", "classObject.className:" + classObject.className);
-    
-    nilStatus("jmsAttributeValueChangeFunc", classObject.jmsAttributeValueChangeFunc);
-    //nilStatus("modelInterface", modelInterface);
-    //nilStatus("idForName", modelInterface.idForName);
-    
-	///logP3Msg("jmsAttributeValueChangeDispatchHandler", "SAMUBA", "modelInterface.idForName:" + modelInterface.idForName);
-	
-    //This is calling the JMS prop change routines with the standard arguments that they have always had
-    classObject.jmsAttributeValueChangeFunc(className, record.objectFullName, propColl, classObject.jmsPropArray, classObject.jmsMapArray);
-
+	_log += "className: " + className + " classObject.className: " + classObject.className + " classObject.dataType: " + classObject.dataType + " ";
+	_log += "classObject.dataType: " + classObject.dataType + " propColl: " + propColl 
+	logP3Msg("jmsAttributeValueChangeDispatchHandler", "SAMUBA", _log);
+    	
+	//This is calling the JMS prop change routines with the standard arguments that they have always had
+	classObject.jmsAttributeValueChangeFunc(className, record.objectFullName, propColl, classObject.jmsPropArray, classObject.jmsMapArray);
 }
 
-//16 January 2013: pass in record object instead of record.objectfullname***
-function jmsDeleteDispatchHandler(record, modelInterface, className, classObject) 
-{
-    //var propColl;
-    // This is calling the existing JMS dispatch routines
-    //classObject.jmsDeleteFunc(record.objectFullName, className);
+// 16 January 2013: pass in record object instead of record.objectfullname***
+function jmsDeleteDispatchHandler(record, modelInterface, className, classObject) {
 	classObject.jmsDeleteFunc(record, className);
 }

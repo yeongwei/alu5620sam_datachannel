@@ -59,12 +59,11 @@ var ubaInventoryHandlers = {
 
 	//OAM Ping
 	"ethernetoam.CfmLoopback": process_cfm_loopback,		//found
-    "ethernetoam.CfmOneWayDelayTest": process_cfm_oneway_delay,//found
-    "ethernetoam.CfmTwoWayDelayTest": process_cfm_twoway_delay,//found
-    "ethernetoam.CfmEthTest": process_cfm_ethernet,			//found
+    	"ethernetoam.CfmOneWayDelayTest": process_cfm_oneway_delay,//found
+    	"ethernetoam.CfmTwoWayDelayTest": process_cfm_twoway_delay,//found
+    	"ethernetoam.CfmEthTest": process_cfm_ethernet,			//found
 	"ethernetoam.CfmSingleEndedLossTest": process_cfm_single_ended_loss,//found
 	"ethernetoam.Mep": process_ethernetoam_mep,
-	
 	
 	// Policies
 	"aingr.Policy": process_aingr_policy,					//found
@@ -256,7 +255,6 @@ var ubaMetricHandlers = {
 	
 	//PPPoE
 	"service.PppoeSapStatsLogRecord": process_svc_pppoe,//
-
 	
 	//3rd January 2014 new in SAM 2.13 find2file pack
 	"ethernetequipment.AggrMaintRxStatsLogRecord": process_aggr_maint_rx_stats,//3rd January 2014
@@ -434,53 +432,6 @@ var metricClassTimestampMapping = {
 
 };//End metricClassTimestampMapping
 
-/*
-    "icmp.IcmpPing", "fromNodeId"
-    "mpls.LspPing", "fromNodeId"
-    "svt.VccvPing", "fromNodeId"
-    "svt.TunnelPing", "fromNodeId"
-    "service.SitePing", "fromNodeId"
-    "mirror.L2AccessInterface", "nodeId"
-    "svt.MeshSdpBinding", "fromNodeId"
-    "svt.MirrorSdpBinding", "fromNodeId"
-    "svt.SpokeSdpBinding", "fromNodeId"
-    "equipment.Shelf", "siteId"
-    "equipment.HwEnvironment", "siteId"
-    "lag.Interface", "siteId"
-    "mpls.Interface", "nodeId"
-    "mpls.DynamicLsp", "siteId"
-    "vprn.L3AccessInterface", "nodeId"
-    "ies.L3AccessInterface", "nodeId"
-    "vpls.L2AccessInterface", "nodeId"
-    "vll.L2AccessInterface", "nodeId"
-    "nqueue.Entry", "siteId"
-    "sonetequipment.Sts1Channel", "siteId"
-    "sonetequipment.Sts3Channel", "siteId"
-    "sonetequipment.Sts12Channel", "siteId"
-    "sonetequipment.Sts48Channel", "siteId"
-    "sonetequipment.Sts192Channel", "siteId"
-    "tdmequipment.DS1E1Channel", "siteId"
-    "tdmequipment.DS3E3Channel", "siteId"
-    "sonetequipment.TributaryChannel", "siteId"
-    "sonetequipment.Tu3Channel", "siteId"
-    "tdmequipment.DS0ChannelGroup", "siteId"
-    "sonetequipment.TributaryGroup", "siteId"
-    "sonetequipment.Tug3Group", "siteId"
-    "ppp.Interface", "nodeId"
-    "rtr.VirtualRouter", "siteId"
-    "ipipe.L2AccessInterface", "nodeId"
-    "equipment.CardSlot", "siteId"
-    "ethernetoam.CfmLoopback", "siteId"
-    "ethernetoam.CfmOneWayDelayTest", "siteId"
-    "ethernetoam.CfmTwoWayDelayTest", "siteId"
-    "ethernetoam.CfmEthTest", "siteId"
-    "aosqos.Policy", "siteId"
-    "mpls.Site", "siteId"
-    "svq.AggregationScheduler", "siteId"
-    "vprn.ServiceAccessPoint", "nodeId"
-    "ies.ServiceAccessPoint", "nodeId"
-*/
-
 function dump_samObject(samObject) 
 {
     logP6Msg("dump_samObject", "SAMIF", "beginning");
@@ -506,134 +457,77 @@ function dump_samObject(samObject)
     logP6Msg("dump_samObject", "SAMIF", "ending");
 }
 
-function initUbaClassHandlers()
-{
-    logP3Msg("initUbaClassHandlers", classname, "Entering");
-
-    /*  ???
-    logStatus("ubaClassHandlers", ubaClassHandlers);
-
-    dump_samObject(ubaClassHandlers);
-
-    logStatus("ubaInventoryHandlers", ubaInventoryHandlers);
-    dump_samObject(ubaInventoryHandlers);
-    logStatus("ubaMetricHandlers", ubaMetricHandlers);
-    dump_samObject(ubaMetricHandlers);
-
-    */
-
-    ubaClassHandlers["C"]=ubaInventoryHandlers;
-    ubaClassHandlers["M"]=ubaMetricHandlers;
-    /*
-    ubaClassHandlers["JMS_C"]=jmsObjectCreateHandlers;
-    ubaClassHandlers["JMS_D"]=jmsObjectDeleteHandlers;
-    ubaClassHandlers["JMS_A"]=jmsAttributeValueChangeHandlers;
-    */
-    //DEBUG: Are these supposed to be enabled?
-    //ubaClassHandlers["A"]=jmsAttributeValueChangeHandlers;
+function initUbaClassHandlers() {
+    ubaClassHandlers["C"] = ubaInventoryHandlers;
+    ubaClassHandlers["M"] = ubaMetricHandlers;
 }
 
-function get_class_handler(dataType, classname) 
-{
+function get_class_handler(dataType, classname) {
     var handlerSet = ubaClassHandlers[dataType];
 
-    if (isUndef(handlerSet)) 
-    {
+    if (isUndef(handlerSet)) {
     	logP3Msg("get_class_handler", "SAMUBA", "No known handlerSet of dataType: " + dataType);
     	return;
     }
 	
-	logP3Msg("get_class_handler", "SAMUBA", "Type of dataType: " + typeof handlerSet);
-	//dump_samObject(handlerSet);
-
     return ubaClassHandlers[dataType][classname];
 }
 
 // Sets up the class objects with the handlers and the associated data the handlers need
-function initClassObjects() 
-{
-    var /*dataType, className,*/ classObject, handler;
+function initClassObjects() {
+    for (var dataType in ubaClassHandlers) { //x["M"] = {"a": "b"} 
+    	for (var className in ubaClassHandlers[dataType]) { 
+    		logP4Msg("addClassHandler", "SAMUBA", "Looking for handler for datatype: " + dataType + " and class: " + className);
 
-    //logP3Msg("addClassHandler", "SAMUBA", "Entering");
-    
-    for (var dataType in ubaClassHandlers)//x["M"] = {"a": "b"} 
-    {
-    	for (var className in ubaClassHandlers[dataType]) 
-    	{
-
-    		logP4Msg("addClassHandler", "Debug", "Looking for handler for datatype: " + dataType + " and class: " + className);
-
-    		classObject = get_class_entry(dataType, className);
+    		var classObject = get_class_entry(dataType, className);
     		
-    		logP4Msg("addClassHandler", "Debug", "Look into classObject");
-    		dump_samObject(classObject);
-    		
-	    	if (isUndef(classObject)) 
-	    	{
+	    	if (isUndef(classObject)) {
 	    		logP4Msg("addClassHandler", "SAMUBA", "Can't find object for datatype: " + dataType + " and class: " + className);
 	    		continue;
 	    	}
 
-	    	handler = get_class_handler(dataType, className);
+	    	var handler = get_class_handler(dataType, className);
 	    	
-	    	logP4Msg("addClassHandler", "Debug", "Look into handler");
-    		dump_samObject(handler);
-    		
-	    	if (isUndef(handler)) 
-	    	{
-	    		logP3Msg("addClassHandler", "SAMUBA", "No known handler function for class: " + className);
+	    	if (isUndef(handler)) {
+	    		logP4Msg("addClassHandler", "SAMUBA", "No known handler function for class: " + className);
 	    		// If you can't find a handler, make sure you have imported the script in the main file
 	    		continue;
 	    	}
 	    
-	    	//logP3Msg("addClassHandler", "SAMUBA", "Initializing handler for datatype: " + dataType + " and class: " + className);
-			//logP3Msg("addClassHandler", "SAMUBA", "Initializing handler for handler: " + handler);
-
 	    	classObject.dataType = dataType;
 	    	classObject.className = className;  // for debug purposes
 	    	classObject.handler = handler;
 
-	    	if (dataType == "C") 
-	    	{
+	    	if (dataType == "C") {
 	    		classObject.timestampHack = true;
 	    	}
-    	} // className
-    } // dataType
+    	}
+    }
 }
 
-function jmsAttributeValueChangeAddHandlerInfo(className, func, propArray, mapArray) 
-{
-    // propArray and mapArray are optional, used only if you want to map property enumeration values to English values
+function jmsAttributeValueChangeAddHandlerInfo(className, func, propArray, mapArray) {
+    	// propArray and mapArray are optional, used only if you want to map property enumeration values to English values
 	logP4Msg("jmsAttributeValueChangeAddHandlerInfo", "Debug", "className -> " + className);
-    var classObject = get_class_entry("A", className);
-    logP4Msg("jmsAttributeValueChangeAddHandlerInfo", "Debug", "typeOf classObject -> " + typeof classObject);
-    logP4Msg("jmsAttributeValueChangeAddHandlerInfo", "Debug", "Look into classObject");
-    dump_samObject(classObject);
-    
-    if (isUndef(classObject)) 
-    {
-    	logP3Msg("jmsAttributeValueChangeAddHandlerInfo", "SAMUBA", "ClassObject not found for " + className);
-    	return;
-    }
 
-    if (isUndef(func)) 
-    {
-    	logP3Msg("jmsAttributeValueChangeAddHandlerInfo", "SAMUBA", "JMS attribute value change function not found for " + className);
-    	return;
-    }
+    	var classObject = get_class_entry("A", className);
     
-    classObject.dataType = "A";
-    classObject.handler = jmsAtrributeValueChangeDispatchHandler;//General callback function for all JMS events to invoke func
-    classObject.className = className; // for debug
-    classObject.jmsAttributeValueChangeFunc = func;//This function will be invoked by jmsAtrributeValueChangeDispatchHandler();
-    classObject.jmsPropArray = propArray;
-    classObject.jmsMapArray = mapArray;
-    classObject.timestampHack = true;
-	
-	logP4Msg("JMS_ATTRIBUTE", "SAMIF", "Attribute Change " + classObject.dataType);
-	
-	//logP4Msg("JMS_ATTRIBUTE", "SAMIF", "Attribute Change " + classObject.handler);
-	//logP4Msg("JMS_ATTRIBUTE", "SAMIF", "Attribute Change " + classObject.className);
+    	if (isUndef(classObject)) {
+    		logP4Msg("jmsAttributeValueChangeAddHandlerInfo", "SAMUBA", "ClassObject not found for " + className);
+    		return;
+    	}
+
+    	if (isUndef(func)) { 
+    		logP4Msg("jmsAttributeValueChangeAddHandlerInfo", "SAMUBA", "JMS attribute value change function not found for " + className);
+    		return;
+    	}
+    
+    	classObject.dataType = "A";
+    	classObject.handler = jmsAtrributeValueChangeDispatchHandler; // General callback function for all JMS events to invoke func
+    	classObject.className = className; 
+    	classObject.jmsAttributeValueChangeFunc = func; // This function will be invoked by jmsAtrributeValueChangeDispatchHandler();
+    	classObject.jmsPropArray = propArray;
+    	classObject.jmsMapArray = mapArray;
+    	classObject.timestampHack = true;
 }
 
 function jmsDeleteAddHandlerInfo(className, func) 

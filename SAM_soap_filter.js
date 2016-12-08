@@ -18,41 +18,28 @@ var no_zero      = '<not><equal name="siteId" value="0.0.0.0"/></not>';
 var filter_range_regexp         = new RegExp("range.([0-9]+)\.\.([0-9]+).",'gi');
 var filter_with_property_regexp = new RegExp("(^[a-zA-Z]+)\\:");
 
-function get_class_entry(dataType, class)
-{
-
-    var filter_table = '';
-
-    logP3Msg("get_class_entry", "SAMIF", "Type: " +dataType + "class: " +class);
+function get_class_entry(dataType, className) {
+    var filter_table = "";
 
     switch (dataType) {
-    case "M":
-	filter_table = met_filter_table;
-	break;
+    		case "M":
+			filter_table = met_filter_table;
+		break;
+    		case "A":
+			filter_table = jmsA_filter_table;
+		break;
+    		case "C":
+			filter_table = inv_filter_table;
+		break;
+    		case "D":
+			filter_table = jmsD_filter_table;
+		break;
+    		default:
+	}; 
 
-    case "A":
-	filter_table = jmsA_filter_table;
-	break;
-
-    //case "INV":
-    case "C":
-	/* JMS create lookups go here */
-	filter_table = inv_filter_table;
-	break;
-
-    case "D":
-	filter_table = jmsD_filter_table;
-	break;
-
-   
-    default:
-    logP3Msg("in default", "Rahul", "dataType  "+dataType);
-    };  // switch
-
-    if (isDef(filter_table[class]))
-    {
-        return(filter_table[class]);
-    }
+    	if (isDef(filter_table[className])){
+        	return(filter_table[className]);
+    	}
 }
 
 
@@ -1005,8 +992,8 @@ function setup_combined_filter_entry(comEntry, incEntry, excEntry) {
         filter_table[comEntry].soap_filter=filter;
     }
 
-    logP3Msg("setup_combined_filter_entry", "SAM", "user filter(for "+comEntry+"):"+filter);
-    logP3Msg("setup_combined_filter_entry", "SAM", "soap filter(for "+comEntry+"):"+filter_table[comEntry].soap_filter);
+    logP4Msg("setup_combined_filter_entry", "SAM", "user filter(for "+comEntry+"):"+filter);
+    logP4Msg("setup_combined_filter_entry", "SAM", "soap filter(for "+comEntry+"):"+filter_table[comEntry].soap_filter);
     
     inentry=filter_table[incEntry];
     exentry=filter_table[excEntry];
@@ -1015,15 +1002,15 @@ function setup_combined_filter_entry(comEntry, incEntry, excEntry) {
     inarray=inentry.list;
     if (isDef(inarray)) {
         inregex = regexp_string_from_list(inarray);
-        logStatus("inarray", inarray);
-        logStatus("inregex", inregex);
+        // logStatus("inarray", inarray);
+        // logStatus("inregex", inregex);
         filter_table[comEntry].inc_regexp=new RegExp(inregex);
-        logStatus("filter_table[comEntry].inc_regexp", filter_table[comEntry].inc_regexp);
+        logP4Msg("setup_combined_filter_entry", "SAM", "filter_table[comEntry].inc_regexp: " + filter_table[comEntry].inc_regexp);
         if (isDef(inentry.filterprop)) {
         filter_table[comEntry].inc_filterprop=inentry.filterprop;
         filter_table[comEntry].filterprop=inentry.filterprop;
         logP4Msg("setup_combined_filter_entry", "SAM", "inc filter set");
-        logP3Msg("setup_combined_filter_entry", "SAM", "inc_regexp filter(for "+comEntry+"):"+inregex);
+        logP4Msg("setup_combined_filter_entry", "SAM", "inc_regexp filter(for "+comEntry+"):"+inregex);
         }
     }
     }
@@ -1037,7 +1024,7 @@ function setup_combined_filter_entry(comEntry, incEntry, excEntry) {
         filter_table[comEntry].exc_filterprop=exentry.filterprop;
         filter_table[comEntry].filterprop=exentry.filterprop;
         logP4Msg("setup_combined_filter_entry", "SAM", "exc filter set");
-        logP3Msg("setup_combined_filter_entry", "SAM", "exc_regexp filter(for "+comEntry+"):"+exregex);
+        logP4Msg("setup_combined_filter_entry", "SAM", "exc_regexp filter(for "+comEntry+"):"+exregex);
         }
         filter_table[comEntry].exclude_all=false;       
         if (isDef(exentry.dcitem)) {
@@ -1049,7 +1036,7 @@ function setup_combined_filter_entry(comEntry, incEntry, excEntry) {
     } // isDef exarray
     } // isDef exentry
     
-    logP3Msg("setup_combined_filter_entry", "SAM", "exiting");
+    logP4Msg("setup_combined_filter_entry", "SAM", "exiting");
     
 }
 
@@ -1063,9 +1050,9 @@ function setup_resultfilter_entry(comEntry, propmap, additional, standard, child
 
     filter = combined_resultfilter_attributes(propmap, additional, standard, children);
     if (filter=="") {
-        logP3Msg("SAM", "setup_resultfilter_entry", "comEntry resultfilter: none");
+        logP4Msg("SAM", "setup_resultfilter_entry", "comEntry resultfilter: none");
     } else {
-        logP3Msg("SAM", "setup_resultfilter_entry", "comEntry resultfilter: " + filter);
+        logP4Msg("SAM", "setup_resultfilter_entry", "comEntry resultfilter: " + filter);
         filter_table[comEntry].resultfilter=filter;
     }
 

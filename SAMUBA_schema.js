@@ -6,247 +6,181 @@
 
 // Alcatel-Lucent 5620 SAM Pack
 
-
+// The prefix new is to indicate that it is meant for L2F UBAs
 function newUBAInit() {
+	var _functionName = "newUBAInit";
+	var _componentName = "SAMUBA";
+	var _log = "";
 
-	//This is now important for SAP inventory creation
-    read_inventory_config();
-    logP3Msg("inventory_config", "SAM", "Look into inv_metric_config_array");
-    dump_samObject(inv_metric_config_array);
-    
-    //accounting_stats_collector=app_config_value("accounting_stats_collector");
-    //polled_stats_collector=app_config_value("polled_stats_collector");
-    
-    logP3Msg("inventory_config", "SAM", "accounting stats collector: " + accounting_stats_collector);
-    logP3Msg("inventory_config", "SAM", "polled stats collector: " + polled_stats_collector);
+	// This is now important for SAP inventory creation
+    	read_inventory_config();
+	
+	_log += "Performance Collector: " + polled_stats_collector + " ";
+	_log += "Accounting Collector: " + accounting_stats_collector + " ";   	 
+	logP3Msg(_functionName, _componentName, _log);
 
-    // For inventory creation (full dump & JMS)
-    filter_table = {};
-    setup_inv_soap_filters();
-    setup_inv_additional_class_entries();
-    logP3Msg("on function newUBAInit()", "Debug", "After setup_inv_additional_class_entries(), looking into inv_filter_table");
-    inv_filter_table = filter_table;
-    dump_samObject(inv_filter_table);
+	// For fullDump	
+    	filter_table = {};
+    	setup_inv_soap_filters();
+    	setup_inv_additional_class_entries();
+    	inv_filter_table = filter_table;
     
-    // For JMS attribute value change
-    filter_table = {};
-    setup_inv_soap_filters();
-    setup_inv_additional_class_entries();
-    logP3Msg("on function newUBAInit()", "Debug", "After setup_inv_additional_class_entries(), looking into jmsA_filter_table");
-    jmsA_filter_table = filter_table;
-    dump_samObject(jmsA_filter_table);
+    	// For JMS attribute value change
+    	filter_table = {};
+    	setup_inv_soap_filters();
+    	setup_inv_additional_class_entries();
+    	jmsA_filter_table = filter_table;
     
-    // For JMS delete
-    // For JMS attribute value change
-    filter_table = {};
-    setup_inv_soap_filters();
-    setup_inv_additional_class_entries();
-    logP3Msg("on function newUBAInit()", "Debug", "After setup_inv_additional_class_entries(), looking into jmsD_filter_table");
-    jmsD_filter_table = filter_table;
-    dump_samObject(jmsD_filter_table);
+    	// For JMS object deletion
+    	filter_table = {};
+    	setup_inv_soap_filters();
+    	setup_inv_additional_class_entries();
+    	jmsD_filter_table = filter_table;
 
-    // For metrics
-    filter_table = {};
-    setup_metric_soap_filters();
-    logP3Msg("on function newUBAInit()", "Debug", "After setup_inv_additional_class_entries(), looking into met_filter_table");
-    met_filter_table = filter_table;
-    dump_samObject(met_filter_table);
+    	// For metrics processing
+    	filter_table = {};
+    	setup_metric_soap_filters();
+    	met_filter_table = filter_table;
 
-    initUbaClassHandlers();//x["M"] = array//Init object of <class_name>: <function>
-    initClassObjects();
-    initJmsAttributeValueChangeHandlers();
-    initJmsDeleteHandlers();
+    	initUbaClassHandlers(); // x["M"] = array
+    	initClassObjects();
+    	initJmsAttributeValueChangeHandlers();
+    	initJmsDeleteHandlers();
 	
 	initialize_service_structures();
-
-
-	//maybe we do not have this ???    initialize_handler_mapping();
-    //initialize_service_structures();
-	//return initializeDomainModel();
 }
 
 /*
  * 25 March 2013: IMPORTANT!!! Current UBA's schema that initializes as CSV
  */
 function createSAMCSVUBASchema(schema_name, filePeriod, precedence, noNewInputLimit) {
-	logP4Msg("createSAMUBASchema", schema_name, "Entering");
+	var _log = "";
+	
 	var _pvConfiguration = PV.configuration;
-	var upperCaseSchemaName = schema_name.toUpperCase();
-	var _deleteOnAcquire = _pvConfiguration['ALCATEL_5620_SAM_LOG2FILE'][upperCaseSchemaName]['DELETEONACQUIRE'];
-	if(_deleteOnAcquire == 'TRUE') {
+	var _upperCaseSchemaName = schema_name.toUpperCase();
+	var _deleteOnAcquire = _pvConfiguration["ALCATEL_5620_SAM_LOG2FILE"][_upperCaseSchemaName]["DELETEONACQUIRE"];
+	if (_deleteOnAcquire == 'TRUE') {
 		_deleteOnAcquire = true;
 	} else {
 		_deleteOnAcquire = false;
 	} 
-	logP4Msg("createSAMUBASchema", schema_name, "deleteOnAcquire: " + _deleteOnAcquire);
-	    
+	_log += "schema_name: " + schema_name + " ";
+	_log += "_deleteOnAcquire: " + _deleteOnAcquire + " ";
+
     	var uba_schema = PV.TextInputSchema(schema_name, {
-			filePeriod: parseInt(app_config_value("FILE_PERIOD")),
-			deleteOnAcquire: _deleteOnAcquire,
-			heartbeatOnLastTimestamp: false,
-			multiFileJoin: true,
-            		noNewInputLimit: 2,
-			precedence: 3,
+		filePeriod: parseInt(app_config_value("FILE_PERIOD")),
+		deleteOnAcquire: _deleteOnAcquire,
+		heartbeatOnLastTimestamp: false,
+		multiFileJoin: true,
+            	noNewInputLimit: 2,
+		precedence: 3,
+		parseURI: function (source) {
+		    	source.timestamp=dateFromSAMFilename(source.localName);
+		},
+		onOpen: function (source) {
+			logP3Msg("onOpen", schema_name, "Opening the file" + source.localName);
+			clearHandlers(); // Avoid temporaryDispatchRoutine firing incorrect handlers
+		},
+		onClose: function(source) { 
+			logP3Msg("onClose", schema_name, "Closing the file" + source.localName);
+		}
+	}); // End TextInputSchema
 
-			parseURI: function(source) {
-			    source.timestamp=dateFromSAMFilename(source.localName);
-		    	},
-			onOpen: function(source) {
-				logP3Msg("onOpen", schema_name, "Opening the file" + source.localName);
-				clearHandlers(); // Avoid temporaryDispatchRoutine firing incorrect handlers
-		    	},
-			onClose: function(source) { 
-				logP3Msg("onClose", schema_name, "Closing the file" + source.localName);
-		    	}
-		}); // End TextInputSchema
-
-    if (isDef(filePeriod)) 
-    {
-    	uba_schema.filePeriod = parseInt(app_config_value("FILE_PERIOD"));
-    }
+    	if (isDef(filePeriod)) { 
+    		uba_schema.filePeriod = parseInt(app_config_value("FILE_PERIOD"));
+		_log += "filePeriod: " + filePeriod + " ";
+    	}
     
-    if (isDef(precedence)) 
-    {
-    	uba_schema.precedence = precedence;
-    }
+	if (isDef(precedence)) {
+    		uba_schema.precedence = precedence;
+		_log += "precedence: " + precedence + " ";
+    	}
     
-    if (isDef(noNewInputLimit)) 
-    {
-    	uba_schema.noNewInputLimit = noNewInputLimit;
-    }
+    	if (isDef(noNewInputLimit)) {
+    		uba_schema.noNewInputLimit = noNewInputLimit;
+		_log += "noNewInputLimit: " + noNewInputLimit + " ";
+    	}
 
-    uba_record_schema = PV.DelimitedRecordSchema(
-    	// uba_record_schema = PV.TypeDispatchSchema(
-    	"recordSchema",
-    	{ 
+	var uba_record_schema = PV.DelimitedRecordSchema("recordSchema", {
     		fieldSeparator: ",",
     		recordSeparator: "\r",
     		maxOccurs: Infinity,
     		hasHeaderRecord: false,
-    		onRead: function(record) 
-    		{
+    		onRead: function (record) {
     			record.timestamp = PV.currentInputDescriptor.timestamp.asUTCSeconds();
-    			//25 March 2013: timestamp should come together with the CSV
-    			//02 April 2013: This will eventually go to record.timestamp
-    			//Just do this to pass it along to the StreamQuery callback
+    			// 25 March 2013: timestamp should come together with the CSV
+    			// 02 April 2013: This will eventually go to record.timestamp
     			this.emitTuple(record);
     		}
-	  		//temporaryDispatchRoutine
-    		//maybe breaks things to have this in here
-    		//25 March 2013: temporaryDispatchRoutine is now used as a callback within the MAIN schema with PV.StreamQuery
-    	},
-    	PV.StringFieldSchema( 
-    			"fields", 
-    			{ 
+	}, PV.StringFieldSchema("fields", {
     				minOccurs: 1, 
     				maxOccurs: 150, 
     				collect: true 
-    			})
-	);
+	}));
 
-    uba_schema.add(uba_record_schema);
+    	uba_schema.add(uba_record_schema);
 
-    logP4Msg("createSAMUBASchema", schema_name, "filePeriod: " + uba_schema.filePeriod);
-    logP4Msg("createSAMUBASchema", schema_name, "precedence: " + uba_schema.precedence);
-    logP4Msg("createSAMUBASchema", schema_name, "noNewInputLimit: " + uba_schema.noNewInputLimit);
-    logP4Msg("createSAMUBASchema", schema_name, "Exiting");
+    	logP4Msg("createSAMUBASchema", schema_name, _log);
 
-    return(uba_schema);
+	return(uba_schema);
 }
 
-function addTypeHandler(record_id, dataType, classname, fields) 
-{
-    var classObject;
-logP4Msg("addTypeHandler",  schema_name, "dataType: " +dataType);
-logP4Msg("addTypeHandler",  schema_name, "classname: " +classname);
-    classObject = get_class_entry(dataType, classname);
-logP4Msg("addTypeHandler",  schema_name, "classObject: " +classObject);	
-logP3Msg("addTypeHandler", "SAMUBA", "************************************");
-	dump_samObject(classObject);
+// Prepare recordId and associated handler object
+function addTypeHandler(record_id, dataType, classname, fields) { 
+	var _log = "";
+	_log += "record_id: " + record_id + " ";
+	_log += "dateType: " + dataType + " ";
+	_log += "classname: " + classname + " ";
+    	
+	var classObject = get_class_entry(dataType, classname);
 
-    if (isUndef(classObject)) 
-    {
-    	logP3Msg("addTypeHandler", "SAMUBA", "Can't find object for datatype: " + dataType + " and class: " + classname);
-    	return;
-    }
+    	if (isUndef(classObject)) {
+		_log += "classObject: undefined";
+    	} else {
+		_log += "classObject: defined";
+    		classObject.record_id = record_id;
+    		classObject.fieldNames = fields;
 
-    classObject.record_id = record_id;
-    classObject.fieldNames = fields;
-    
-    
-    logStatus("record_id", record_id);
-    logStatus("classname", classname);
-    logStatus("classObject", classObject);
-    
-    
-
-    temporaryHandlerLookup[record_id] = classObject;
-	logStatus("temporaryHandlerLookup",temporaryHandlerLookup);
-
-    //addTypeHandler(record_id, handler, fields, dataType, classname);
-
-    logP5Msg("addTypeHandler", "SAMUBA", "Added handler for class: " + classname);
-    // ??? change this to a higher debug level or remove it later
+		temporaryHandlerLookup[record_id] = classObject;
+		_log += "temporaryHandlerLookup: true";
+	}
+	logP3Msg("addTypeHandler", "SAMUBA", _log);
 }
 
-function zeroRecordHandler(record) 
-{
-    //Record has two fields: fields[0]: The recordId (always 0)  fields[1]: the record definition itself
-    //var recordId = record.recordType;
-    var recordId =  record.fields[0];
-    var recordDef;
+function zeroRecordHandler(record) { 
+    	// Record has two fields: fields[0]: The recordId (always 0)  fields[1]: the record definition itself
+    	// var recordId = record.recordType;
+    	var recordId =  record.fields[0];
 
-    //logP3Msg("zeroRecordHandler", "SAMUBA", "Entering");
-
-    //This should always be 0
-    if (isUndef(recordId) || (recordId != 0)) 
-    {
-	    logP3Msg("zeroRecordHandler", "SAMUBA", "recordId not zero!");
-	    return;
+    	// This should always be 0
+    	if (isUndef(recordId) || (recordId != 0)) {
+	    	logP3Msg("zeroRecordHandler", "SAMUBA", "recordId not zero!");
+	    	return;
 	}
 	
-    /*
-    logP3Msg("zeroRecordHandler", "SAMUBA", "field[0]: " + record.fields[0]);
-    logP3Msg("zeroRecordHandler", "SAMUBA", "field[1]: " + record.fields[1]);
-    */
+    	var recordDef = eval('('+record.fields[1]+')'); // JSON into array object
 
-    recordDef = eval('('+record.fields[1]+')');//JSON into array object
+    	var className = recordDef.className;		// equipment.PhysicalPort
+    	var recordType = recordDef["recordType"];	// <int> 1, 10, 31, ...
+    	var dataType = recordDef["dataType"];		// M, A, D
+    	var fieldNames = recordDef["fieldNames"];	// ""fieldNames"":[""accountingPolicyId"",""actualSpeed"",""administra
 
-    var className = recordDef.className;	//equipment.PhysicalPort
-    var recordType = recordDef["recordType"];	//<int> 1, 10, 31, ...
-    var dataType = recordDef["dataType"];	//M, A, D
-    var fieldNames = recordDef["fieldNames"];//""fieldNames"":[""accountingPolicyId"",""actualSpeed"",""administra
-
-    /*
-    logStatus("recordDef", recordDef);
-    logStatus("recordDef type", typeof(recordDef));
-    logStatus("recordType", recordType);
-    logStatus("dataType", dataType);
-    logStatus("fieldNames", fieldNames);
-    logStatus("className", className);
-
-    */
-
-	if (isUndef(recordType)) 
-	{
+	if (isUndef(recordType)) {
 	    logP3Msg("zeroRecordHandler", "SAMUBA", "recordType not defined in record");
 	    return;
 	}
 	
-	if (isUndef(dataType)) 
-	{
+	if (isUndef(dataType)) { 
 	    logP3Msg("zeroRecordHandler", "SAMUBA", "dataType not defined in record");
 	    return;
 	}
 	
-	if (isUndef(className)) 
-	{
+	if (isUndef(className)) {
 	    logP3Msg("zeroRecordHandler", "SAMUBA", "className not defined in record");
 	    return;
 	}
 	
-	if (isUndef(fieldNames)) 
-	{
+	if (isUndef(fieldNames)) {
 	    logP3Msg("zeroRecordHandler", "SAMUBA", "fieldNames not defined in record");
 	    return;
 	}
@@ -254,91 +188,28 @@ function zeroRecordHandler(record)
 	addTypeHandler(recordType, dataType, className, fieldNames);
 }
 
-// This is to be used only until the UBA enhancements add the 0-record handling and record-type dispatch functioinality
-function temporaryDispatchRoutine (record) 
-{
-	//logP3Msg("temporaryDispatchRoutine", "DEBUG", "Looking into record before parsed");
-	//dump_samObject(record);
-	
+function temporaryDispatchRoutine(record) {
     var recordId = record.fields[0];
 
-    // logP3Msg("temporaryDispatchRoutine", "SAMUBA", "record is " + record);
-   
-    /*
-    if (isUndef(recordId)){
-	    logP3Msg("temporaryDispatchRoutine", "SAMUBA", "recordId not defined!");
-	    return;
-	}
-    */
-
-    // logP3Msg("temporaryDispatchRoutine", "SAMUBA", "recordId is " + recordId);
-
-
-    if (recordId == 0) 
-    {
+    if (recordId == 0) {
     	zeroRecordHandler(record);
-    } 
-    else 
-    {
-			logStatus("temporaryHandlerLookup",temporaryHandlerLookup);
-			
-    	logStatus("temporaryHandlerLookup[recordId]",temporaryHandlerLookup[recordId]);
-    	var handlerEntry = temporaryHandlerLookup[recordId];
-    	// handlerEntry is the classObject
+    } else { 
+    	var handlerEntry = temporaryHandlerLookup[recordId]; // Returns classObject from get_class_entry
 
-    	/*
-    	logStatus("record_id", record_id);
-    	logStatus("classObject", classObject);
-    	logStatus("handlerEntry", handlerEntry);
-    	logStatus("temporaryHandlerLookup", temporaryHandlerLookup);
-    	 */
-
-    	if (isUndef(handlerEntry)) 
-    	{
+    	if (isUndef(handlerEntry)) {
 	    	logP3Msg("temporaryDispatchRoutine", "SAMUBA", "Handler not found for recordId " + recordId + "-- skipping");
 	    	return;
     	}
 
-    	/*
-		logStatus("className", handlerEntry.className);
-		nilStatus("handler", handlerEntry.handler);
-		dump_samObject(handlerEntry);
-    	 */
-
-    	//nilStatus("handler", handlerEntry.handler);
-    	//dump_samObject(handlerEntry);
-
-    	// This should only be true for messages originating from JMS
-    	// (Inventory-related only)
-    	// The value in timeCaptured will be the MTOSI_osTime
-    	// Apparently used due to a shortcoming in datastage processing model
-    	// ALU timestamps are in milliseconds
-    	/*
-    	if (handlerEntry.timestampHack == true) 
-    	{
-    		if (record.timeCaptured != null)
-    		{
-    			record.timestamp = record.timeCaptured / 1000;
-    		}
-    	}
-		*/
-		logStatus("recordId", recordId);
-		logP7Msg("temporaryDispatchRoutine", "SAMUBA", "HandlerEntry "+handlerEntry.className);
-			logP7Msg("temporaryDispatchRoutine", "SAMUBA", "HandlerEntry "+handlerEntry.handler);
     	assignFields(record, handlerEntry.className, handlerEntry.fieldNames, handlerEntry.classObject);
 	
-    	//data types mapped, (object record, object moduleInterface, string handlerEntry.className, object handlerEntry)
-    	if((typeof handlerEntry.handler) == "function")
-    	{
+    	if((typeof handlerEntry.handler) == "function") {
     		handlerEntry.handler(record, modelInterface, handlerEntry.className, handlerEntry);
-    	}
-    	else
-    	{
+    	} else {
     		logP3Msg("temporaryDispatchRoutine", "SAMUBA", "NO HANDLER DEFINED!!! SKIPPING -> " + record);
     	}
     	
     	OPERATOR.emitTuple(record);
-    	//logP3Msg("temporaryDispatchRoutine", "SAMUBA", "emitted record (containing inventory or metric update?)");
     }
 }
 
@@ -366,113 +237,6 @@ function assignFields(record, classname, fieldNames, classObject) {
     
 }
 
-function clearHandlers() 
-{
+function clearHandlers() {
     temporaryHandlerLookup = {};
 }
-
-/*
- * 25 March 2013: Below function is no used as it was meant for F2F 
- */
-/*
-function createSAMUBASchema(schema_name, filePeriod, precedence, noNewInputLimit) 
-{
-
-    logP4Msg("createSAMUBASchema", schema_name, "Entering the create UBA schema function");
-
-    var _pvConfiguration = PV.configuration;
-    var upperCaseSchemaName = schema_name.toUpperCase();
-    var deleteOnAcquire = _pvConfiguration['ALCATEL_5620_SAM_LOG2FILE'][upperCaseSchemaName]['DELETEONACQUIRE'];
-    
-    logP4Msg("createSAMUBASchema", schema_name, "Creating schema with deleteOnAcquire -> " + deleteOnAcquire);
-    
-    var uba_schema = PV.XMLInputSchema(
-    		schema_name,
-            {
-    			filePeriod: 900,
-    			//deleteOnAcquire: true,
-    			deleteOnAcquire: deleteOnAcquire,
-    			parseURI: function(source) 
-    			{
-    					source.timestamp=dateFromSAMFilename(source.localName);
-    			},
-    			precedence: 3,
-    			ignoreProcessingErrors: true
-    		}
-		);  // XmlInputSchema
-
-    if (isDef(filePeriod)) 
-    {
-    	uba_schema.filePeriod = filePeriod;
-    }
-    
-    if (isDef(precedence)) 
-    {
-    	uba_schema.precedence = precedence;
-    }
-    
-    if (isDef(noNewInputLimit)) 
-    {
-    	uba_schema.noNewInputLimit = noNewInputLimit;
-    }
-
-    logP4Msg("createSAMUBASchema", schema_name, "File period: " + uba_schema.filePeriod);
-    logP4Msg("createSAMUBASchema", schema_name, "Precedence: " + uba_schema.precedence);
-    logP4Msg("createSAMUBASchema", schema_name, "No New Input Limit: " + uba_schema.noNewInputLimit);
-
-    logP4Msg("createSAMUBASchema", schema_name, "Exiting the create UBA schema function");
-
-    return(uba_schema);
-}
-*/
-
-/*
- * 25 March 2013: Below function is no used as it was meant for F2F 
- */
-/*
-function addSAMUBARecordSchema(uba_schema, record_name, xml_record_name, metrics, additional_metrics) 
-{
-    logP4Msg("addSAMUBARecordSchema", xml_record_name, "Entering the add UBA record function");
-
-    var i;
-    var fields = new Array();
-    var record_schema = PV.XMLRecordSchema( 
-    		record_name, 
-    		{ 
-    			xpath:XPathExp(xml_record_name),
-				onRead: function(rec) 
-				{ 
-					rec.timestamp=this.inputSchema.currentObject.timestamp.asUTCSeconds();
-					logP3Msg("timestamp processing", "SAMUBA", "About to emit");
-					this.emitTuple(rec); 
-	            },
-				maxOccurs: Infinity 
-	         }  
-    	);
-
-    if (isDef(metrics)) 
-    {
-    	fields=fields.concat(metrics);
-	}
-
-    if (isDef(additional_metrics)) 
-    {
-    	fields=fields.concat(additional_metrics);
-    }
-
-
-    for (i in fields) 
-    {
-    	logP4Msg("addSAMUBARecordSchema", xml_record_name, "Record name: " +record_name+ " i: " +fields[i]);
-    	record_schema.add(PV.StringFieldSchema(fields[i], {xpath: XPathExp(fields[i])}));
-    }
-
-    //addAttributeFieldSchemas(record_schema);
-
-    uba_schema.add(record_schema);
-
-    logP4Msg("addSAMUBARecordSchema", xml_record_name, "Exiting the add UBA record function");
-
-    return(uba_schema);
-}
-*/
