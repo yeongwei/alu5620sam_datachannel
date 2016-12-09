@@ -109,7 +109,7 @@ function jms_simple_propChange_with_mapping(className, objectName, propColl, pro
 		
 		 logP2Msg("*******PMR16515", "SAMIF", "Entering into updating LABEL******");
 		 
-		  
+		 if (isDef(propArray[propName])) { 
 			if (propArray[propName].toString() == "samActualSpeed"){
 				
 				logP2Msg("********In true : jms_speed_update_equipment_physical_port", "SAMIF", "PROP_NAME=samActualSpeed**********");
@@ -146,7 +146,7 @@ function jms_simple_propChange_with_mapping(className, objectName, propColl, pro
 				subelement.addProperty("samActualSpeedDisplay", _actualSpeedDisplayValue);	
 			}
 	
-		
+		}
 		 logP2Msg("*******PMR16515", "SAMIF", "Exiting into updating LABEL******");
 		
 	}
